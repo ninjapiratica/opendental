@@ -4,11 +4,7 @@
 **REQUIREMENT:** You must first install the [Trial Version](https://www.opendental.com/trial.html) so you can see the files involved in the installation process. This is the *ONLY* way to get the initial database tables installed. Then you can later attempt to compile the source code files.
 
 * See [Programming Resources](https://www.opendental.com/site/programmingresources.html) for database documentation.
-* See [Previous Versions](https://opendentalsoft.com:1943/ODBugTracker/PreviousVersions.aspx) for changes have been made since the last version. 
-* See [Subversion (SVN)](https://opendentalsoft.com:23793/svn/opendental) for old source code versions before 2022.
-    * username: **guest**
-    * password: **od123**
-* See [Downloads](https://www.opendental.com/manual/downloads.html) for very old source code versions before 2007.
+* See [Previous Versions](https://opendentalsoft.com:1943/ODBugTracker/PreviousVersions.aspx) for changes have been made since the last version.
 
 ## Getting Started
 Each branch contains all of the corresponding releases for said Major and Minor version and each commit the branches will contain the code for each Major, Minor, and Build version.
