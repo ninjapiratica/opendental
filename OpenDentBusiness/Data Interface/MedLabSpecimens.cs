@@ -1,12 +1,14 @@
 using System;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Reflection;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class MedLabSpecimens{
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class MedLabSpecimens
+    {
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 
 		private class MedLabSpecimenCache : CacheListAbs<MedLabSpecimen> {
@@ -85,26 +87,30 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary></summary>
-		public static long Insert(MedLabSpecimen medLabSpecimen) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				medLabSpecimen.MedLabSpecimenNum=Meth.GetLong(MethodBase.GetCurrentMethod(),medLabSpecimen);
-				return medLabSpecimen.MedLabSpecimenNum;
-			}
-			return Crud.MedLabSpecimenCrud.Insert(medLabSpecimen);
-		}
-		
-		///<summary>Deletes all MedLabSpecimen objects from the db for a list of MedLabNums.</summary>
-		public static void DeleteAllForLabs(List<long> listLabNums) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listLabNums);
-				return;
-			}
-			string command="DELETE FROM medlabspecimen WHERE MedLabNum IN("+String.Join(",",listLabNums)+")";
-			Db.NonQ(command);
-		}
+        ///<summary></summary>
+        public static long Insert(MedLabSpecimen medLabSpecimen)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                medLabSpecimen.MedLabSpecimenNum = Meth.GetLong(MethodBase.GetCurrentMethod(), medLabSpecimen);
+                return medLabSpecimen.MedLabSpecimenNum;
+            }
+            return Crud.MedLabSpecimenCrud.Insert(medLabSpecimen);
+        }
 
-		/*
+        ///<summary>Deletes all MedLabSpecimen objects from the db for a list of MedLabNums.</summary>
+        public static void DeleteAllForLabs(List<long> listLabNums)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), listLabNums);
+                return;
+            }
+            string command = "DELETE FROM medlabspecimen WHERE MedLabNum IN(" + String.Join(",", listLabNums) + ")";
+            Db.NonQ(command);
+        }
+
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -143,5 +149,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

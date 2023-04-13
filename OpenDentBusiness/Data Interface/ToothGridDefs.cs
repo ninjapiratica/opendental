@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class ToothGridDefs{
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class ToothGridDefs
+    {
+        /*
 		#region CachePattern
 
 		private class ToothGridDefCache : CacheListAbs<ToothGridDef> {
@@ -85,15 +84,17 @@ namespace OpenDentBusiness{
 
 		#endregion*/
 
-		public static List<ToothGridDef> Refresh(long patNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<ToothGridDef>>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			string command="SELECT * FROM toothgriddef WHERE toothgriddefnum = "+POut.Long(patNum);
-			return Crud.ToothGridDefCrud.SelectMany(command);
-		}
+        public static List<ToothGridDef> Refresh(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<ToothGridDef>>(MethodBase.GetCurrentMethod(), patNum);
+            }
+            string command = "SELECT * FROM toothgriddef WHERE toothgriddefnum = " + POut.Long(patNum);
+            return Crud.ToothGridDefCrud.SelectMany(command);
+        }
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -141,5 +142,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

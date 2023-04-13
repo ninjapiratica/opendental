@@ -1,65 +1,75 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class MapAreaContainers{
-		///<summary>Order is by sitenum, then by description.</summary>
-		public static List<MapAreaContainer> GetAll(long siteNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<MapAreaContainer>>(MethodBase.GetCurrentMethod(),siteNum);
-			}
-			//Add a custom order to this map list which will prefer maps that are associated with the local computer's site.
-			//_listMapAreaContainers=_listMapAreaContainers.OrderBy(x => x.SiteNum!=_siteThisComputer.SiteNum)
-			//	.ThenBy(x => x.Description).ToList();
-			string command="SELECT * FROM mapareacontainer ORDER BY SiteNum <> "+POut.Long(siteNum)
-				+", Description";
-			return Crud.MapAreaContainerCrud.SelectMany(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class MapAreaContainers
+    {
+        ///<summary>Order is by sitenum, then by description.</summary>
+        public static List<MapAreaContainer> GetAll(long siteNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<MapAreaContainer>>(MethodBase.GetCurrentMethod(), siteNum);
+            }
+            //Add a custom order to this map list which will prefer maps that are associated with the local computer's site.
+            //_listMapAreaContainers=_listMapAreaContainers.OrderBy(x => x.SiteNum!=_siteThisComputer.SiteNum)
+            //	.ThenBy(x => x.Description).ToList();
+            string command = "SELECT * FROM mapareacontainer ORDER BY SiteNum <> " + POut.Long(siteNum)
+                + ", Description";
+            return Crud.MapAreaContainerCrud.SelectMany(command);
+        }
 
-		public static void SaveWholeListToDb(List<MapAreaContainer> listMapAreaContainers) {	
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listMapAreaContainers);
-			}
-			//We do it the same as before the refactor.  Delete everything and re-insert.  Improve later
-			string command="DELETE FROM mapareacontainer";
-			Db.NonQ(command);
-			for(int i=0;i<listMapAreaContainers.Count;i++){
-				Crud.MapAreaContainerCrud.Insert(listMapAreaContainers[i],useExistingPK:true);
-			}
-		}
+        public static void SaveWholeListToDb(List<MapAreaContainer> listMapAreaContainers)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), listMapAreaContainers);
+            }
+            //We do it the same as before the refactor.  Delete everything and re-insert.  Improve later
+            string command = "DELETE FROM mapareacontainer";
+            Db.NonQ(command);
+            for (int i = 0; i < listMapAreaContainers.Count; i++)
+            {
+                Crud.MapAreaContainerCrud.Insert(listMapAreaContainers[i], useExistingPK: true);
+            }
+        }
 
-		///<summary></summary>
-		public static long Insert(MapAreaContainer mapAreaContainer){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				mapAreaContainer.MapAreaContainerNum=Meth.GetLong(MethodBase.GetCurrentMethod(),mapAreaContainer);
-				return mapAreaContainer.MapAreaContainerNum;
-			}
-			return Crud.MapAreaContainerCrud.Insert(mapAreaContainer);
-		}
+        ///<summary></summary>
+        public static long Insert(MapAreaContainer mapAreaContainer)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                mapAreaContainer.MapAreaContainerNum = Meth.GetLong(MethodBase.GetCurrentMethod(), mapAreaContainer);
+                return mapAreaContainer.MapAreaContainerNum;
+            }
+            return Crud.MapAreaContainerCrud.Insert(mapAreaContainer);
+        }
 
-		///<summary></summary>
-		public static void Update(MapAreaContainer mapAreaContainer){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),mapAreaContainer);
-				return;
-			}
-			Crud.MapAreaContainerCrud.Update(mapAreaContainer);
-		}
+        ///<summary></summary>
+        public static void Update(MapAreaContainer mapAreaContainer)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), mapAreaContainer);
+                return;
+            }
+            Crud.MapAreaContainerCrud.Update(mapAreaContainer);
+        }
 
-		///<summary></summary>
-		public static void Delete(long mapAreaContainerNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),mapAreaContainerNum);
-				return;
-			}
-			string command= "DELETE FROM mapareacontainer WHERE MapAreaContainerNum = "+POut.Long(mapAreaContainerNum);
-			Db.NonQ(command);
-		}
-	}
+        ///<summary></summary>
+        public static void Delete(long mapAreaContainerNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), mapAreaContainerNum);
+                return;
+            }
+            string command = "DELETE FROM mapareacontainer WHERE MapAreaContainerNum = " + POut.Long(mapAreaContainerNum);
+            Db.NonQ(command);
+        }
+    }
 }
 
 

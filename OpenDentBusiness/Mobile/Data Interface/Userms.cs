@@ -1,32 +1,32 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Text;
+namespace OpenDentBusiness.Mobile
+{
+    ///<summary></summary>
+    public class Userms
+    {
 
-namespace OpenDentBusiness.Mobile{
-	///<summary></summary>
-	public class Userms{
+        ///<summary>Gets one Userm from the db.</summary>
+        public static Userm GetOne(long customerNum, long usermNum)
+        {
+            return Crud.UsermCrud.SelectOne(customerNum, usermNum);
+        }
 
-		///<summary>Gets one Userm from the db.</summary>
-		public static Userm GetOne(long customerNum,long usermNum) {
-			return Crud.UsermCrud.SelectOne(customerNum,usermNum);
-		}
+        public static Userm GetOne(string command)
+        {
+            return Crud.UsermCrud.SelectOne(command);
+        }
+        ///<summary></summary>
+        public static long Insert(Userm userm)
+        {
+            return Crud.UsermCrud.Insert(userm, true);
+        }
 
-		public static Userm GetOne(string command) {
-			return Crud.UsermCrud.SelectOne(command);
-		}
-		///<summary></summary>
-		public static long Insert(Userm userm) {
-			return Crud.UsermCrud.Insert(userm,true);
-		}
+        ///<summary></summary>
+        public static void Update(Userm userm)
+        {
+            Crud.UsermCrud.Update(userm);
+        }
 
-		///<summary></summary>
-		public static void Update(Userm userm) {
-			Crud.UsermCrud.Update(userm);
-		}
-
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -68,5 +68,5 @@ namespace OpenDentBusiness.Mobile{
 
 
 
-	}
+    }
 }

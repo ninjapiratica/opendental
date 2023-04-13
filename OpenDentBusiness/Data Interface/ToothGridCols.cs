@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Text;
-
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class ToothGridCols{
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class ToothGridCols
+    {
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -55,5 +51,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

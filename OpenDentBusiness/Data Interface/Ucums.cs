@@ -1,15 +1,15 @@
-using System;
+using DataConnectionBase;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
-using DataConnectionBase;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class Ucums{
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class Ucums
+    {
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 
 		private class UcumCache : CacheListAbs<Ucum> {
@@ -88,83 +88,101 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary></summary>
-		public static long Insert(Ucum ucum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				ucum.UcumNum=Meth.GetLong(MethodBase.GetCurrentMethod(),ucum);
-				return ucum.UcumNum;
-			}
-			return Crud.UcumCrud.Insert(ucum);
-		}
+        ///<summary></summary>
+        public static long Insert(Ucum ucum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                ucum.UcumNum = Meth.GetLong(MethodBase.GetCurrentMethod(), ucum);
+                return ucum.UcumNum;
+            }
+            return Crud.UcumCrud.Insert(ucum);
+        }
 
-		///<summary></summary>
-		public static void Update(Ucum ucum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),ucum);
-				return;
-			}
-			Crud.UcumCrud.Update(ucum);
-		}
+        ///<summary></summary>
+        public static void Update(Ucum ucum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), ucum);
+                return;
+            }
+            Crud.UcumCrud.Update(ucum);
+        }
 
-		public static List<Ucum> GetAll() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<Ucum>>(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT * FROM ucum ORDER BY UcumCode";
-			return Crud.UcumCrud.SelectMany(command);
-		}
+        public static List<Ucum> GetAll()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<Ucum>>(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT * FROM ucum ORDER BY UcumCode";
+            return Crud.UcumCrud.SelectMany(command);
+        }
 
-		public static long GetCodeCount() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetLong(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT COUNT(*) FROM ucum";
-			return PIn.Long(Db.GetCount(command));
-		}
+        public static long GetCodeCount()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetLong(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT COUNT(*) FROM ucum";
+            return PIn.Long(Db.GetCount(command));
+        }
 
-		///<summary>Returns a list of just the codes for use in update or insert logic.</summary>
-		public static List<string> GetAllCodes() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod());
-			}
-			List<string> retVal=new List<string>();
-			string command="SELECT UcumCode FROM ucum";
-			DataTable table=DataCore.GetTable(command);
-			for(int i=0;i<table.Rows.Count;i++) {
-				retVal.Add(table.Rows[i].ItemArray[0].ToString());
-			}
-			return retVal;
-		}
+        ///<summary>Returns a list of just the codes for use in update or insert logic.</summary>
+        public static List<string> GetAllCodes()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod());
+            }
+            List<string> retVal = new List<string>();
+            string command = "SELECT UcumCode FROM ucum";
+            DataTable table = DataCore.GetTable(command);
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                retVal.Add(table.Rows[i].ItemArray[0].ToString());
+            }
+            return retVal;
+        }
 
-		public static Ucum GetByCode(string ucumCode) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<Ucum>(MethodBase.GetCurrentMethod(),ucumCode);
-			}
-			string command;
-			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				command="SELECT * FROM ucum WHERE UcumCode='"+POut.String(ucumCode)+"'";
-			}
-			else {
-				//because when we search for UnumCode 'a' for 'year [time]' used for age we sometimes get 'A' for 'Ampere [electric current]'
-				//since MySQL is case insensitive, so we compare the binary values of 'a' and 'A' which are 0x61 and 0x41 in Hex respectively.
-				command="SELECT * FROM ucum WHERE CAST(UcumCode AS BINARY)=CAST('"+POut.String(ucumCode)+"' AS BINARY)";
-			}
-			return Crud.UcumCrud.SelectOne(command);
-		}
+        public static Ucum GetByCode(string ucumCode)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<Ucum>(MethodBase.GetCurrentMethod(), ucumCode);
+            }
+            string command;
+            if (DataConnection.DBtype == DatabaseType.Oracle)
+            {
+                command = "SELECT * FROM ucum WHERE UcumCode='" + POut.String(ucumCode) + "'";
+            }
+            else
+            {
+                //because when we search for UnumCode 'a' for 'year [time]' used for age we sometimes get 'A' for 'Ampere [electric current]'
+                //since MySQL is case insensitive, so we compare the binary values of 'a' and 'A' which are 0x61 and 0x41 in Hex respectively.
+                command = "SELECT * FROM ucum WHERE CAST(UcumCode AS BINARY)=CAST('" + POut.String(ucumCode) + "' AS BINARY)";
+            }
+            return Crud.UcumCrud.SelectOne(command);
+        }
 
-		public static List<Ucum> GetBySearchText(string searchText) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<Ucum>>(MethodBase.GetCurrentMethod(),searchText);
-			}
-			string[] searchTokens=searchText.Split(' ');
-			string command=@"SELECT * FROM ucum ";
-			for(int i=0;i<searchTokens.Length;i++) {
-				command+=(i==0?"WHERE ":"AND ")+"(UcumCode LIKE '%"+POut.String(searchTokens[i])+"%' OR Description LIKE '%"+POut.String(searchTokens[i])+"%') ";
-			}
-			return Crud.UcumCrud.SelectMany(command);
-		}
+        public static List<Ucum> GetBySearchText(string searchText)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<Ucum>>(MethodBase.GetCurrentMethod(), searchText);
+            }
+            string[] searchTokens = searchText.Split(' ');
+            string command = @"SELECT * FROM ucum ";
+            for (int i = 0; i < searchTokens.Length; i++)
+            {
+                command += (i == 0 ? "WHERE " : "AND ") + "(UcumCode LIKE '%" + POut.String(searchTokens[i]) + "%' OR Description LIKE '%" + POut.String(searchTokens[i]) + "%') ";
+            }
+            return Crud.UcumCrud.SelectMany(command);
+        }
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -194,5 +212,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

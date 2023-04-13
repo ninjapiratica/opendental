@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace OpenDental.Reporting.Allocators.MyAllocator1
 {
     class ODDataCheckQuerry
-	{
-		#region Private Static Objects
-		#region RawData Don't use by itself because it will select 70,000+ records
-		/// <summary>
+    {
+        #region Private Static Objects
+        #region RawData Don't use by itself because it will select 70,000+ records
+        /// <summary>
         /// Selects all payments, Adjustments, and charges
         /// </summary>
         private static readonly string RawData = @"SELECT 
@@ -111,12 +107,12 @@ WHERE
 
 
 
-#endregion
-		#endregion
+        #endregion
+        #endregion
 
-		#region Public Static Objects
-		#region CheckForNegPayments
-		/// <summary>
+        #region Public Static Objects
+        #region CheckForNegPayments
+        /// <summary>
         /// Fields Selected Include:
         /// Patient.LName, 
         /// Patient.FName, 
@@ -125,8 +121,8 @@ WHERE
         /// tbl1.Ammount
         /// </summary>
         public static readonly string CheckForNegPayments = ""
-            +"SELECT Patient.LName, Patient.FName, Patient.PatNum, "
-            +" tbl1.Date,tbl1.Ammount \nFROM ( " + ODDataCheckQuerry.RawData 
+            + "SELECT Patient.LName, Patient.FName, Patient.PatNum, "
+            + " tbl1.Date,tbl1.Ammount \nFROM ( " + ODDataCheckQuerry.RawData
             + " ) as tbl1, Patient \nWHERE Patient.PatNum = tbl1.Patient "
             + "\n&& tbl1.Type = '1' "
             + "\n&& tbl1.Ammount > 0";
@@ -142,17 +138,17 @@ WHERE
         /// </summary>
         public static readonly string CheckForNegCharges = ""
             + "SELECT Patient.LName, Patient.FName, Patient.PatNum, "
-            + " tbl1.Date,tbl1.Ammount\n FROM( " + ODDataCheckQuerry.RawData 
+            + " tbl1.Date,tbl1.Ammount\n FROM( " + ODDataCheckQuerry.RawData
             + " ) as tbl1, Patient\nWHERE Patient.PatNum = tbl1.Patient\n"
             + "\n&& tbl1.Type = '0' "
             + "\n&& tbl1.Ammount < 0";
-             #endregion
+        #endregion
 
         #region  Get Guarantors of Specific Patients
         /// <summary>
         /// Finds all the guarantors associated with Patients
         /// </summary>
-        public static  string GuarantorsOfPatient(uint[] Patients)
+        public static string GuarantorsOfPatient(uint[] Patients)
         {
             string command = "SELECT DISTINCT(Patient.Guarantor) \nFROM Patient \nWHERE ";
             for (int i = 0; i < Patients.Length; i++)
@@ -167,6 +163,6 @@ WHERE
 
         }
         #endregion
-		#endregion
-	}
+        #endregion
+    }
 }

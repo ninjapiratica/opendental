@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class AutoCommExcludeDates{
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class AutoCommExcludeDates
+    {
         //If this table type will exist as cached data, uncomment the Cache Pattern region below and edit.
         /*
 		#region Cache Pattern
@@ -98,56 +97,68 @@ namespace OpenDentBusiness{
 		#endregion Cache Pattern
 		*/
 
-		#region Methods - Get
-		///<summary></summary>
-		public static List<AutoCommExcludeDate> Refresh(long clinicNum) {
-            if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-                return Meth.GetObject<List<AutoCommExcludeDate>>(MethodBase.GetCurrentMethod(),clinicNum);
+        #region Methods - Get
+        ///<summary></summary>
+        public static List<AutoCommExcludeDate> Refresh(long clinicNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<AutoCommExcludeDate>>(MethodBase.GetCurrentMethod(), clinicNum);
             }
             string command = $"SELECT * FROM autocommexcludedate WHERE ClinicNum = {POut.Long(clinicNum)} ORDER BY autocommexcludedate.DateExclude ASC";
             return Crud.AutoCommExcludeDateCrud.SelectMany(command);
         }
 
         ///<summary>Gets one AutoCommExcludeDate from the db.</summary>
-        public static AutoCommExcludeDate GetOne(long autoCommExcludeDateNum) {
-            if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-                return Meth.GetObject<AutoCommExcludeDate>(MethodBase.GetCurrentMethod(),autoCommExcludeDateNum);
+        public static AutoCommExcludeDate GetOne(long autoCommExcludeDateNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<AutoCommExcludeDate>(MethodBase.GetCurrentMethod(), autoCommExcludeDateNum);
             }
             return Crud.AutoCommExcludeDateCrud.SelectOne(autoCommExcludeDateNum);
         }
 
-		/// <summary>Clinic 0 is used for HQ Clinic or when clinics are turned off. </summary>
-		public static List<AutoCommExcludeDate> GetFutureForClinic(long clinicNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<AutoCommExcludeDate>>(MethodBase.GetCurrentMethod(),clinicNum);
-			}
-			string command = $"SELECT * FROM autocommexcludedate WHERE ClinicNum = {POut.Long(clinicNum)} AND DateExclude >= CURDATE() ORDER BY autocommexcludedate.DateExclude ASC";
-			return Crud.AutoCommExcludeDateCrud.SelectMany(command);
-		}
+        /// <summary>Clinic 0 is used for HQ Clinic or when clinics are turned off. </summary>
+        public static List<AutoCommExcludeDate> GetFutureForClinic(long clinicNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<AutoCommExcludeDate>>(MethodBase.GetCurrentMethod(), clinicNum);
+            }
+            string command = $"SELECT * FROM autocommexcludedate WHERE ClinicNum = {POut.Long(clinicNum)} AND DateExclude >= CURDATE() ORDER BY autocommexcludedate.DateExclude ASC";
+            return Crud.AutoCommExcludeDateCrud.SelectMany(command);
+        }
 
-		public static List<AutoCommExcludeDate> GetAllFuture() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<AutoCommExcludeDate>>(MethodBase.GetCurrentMethod());
-			}
-			string command = $"SELECT * FROM autocommexcludedate WHERE DateExclude >= CURDATE() ORDER BY autocommexcludedate.DateExclude ASC";
-			return Crud.AutoCommExcludeDateCrud.SelectMany(command);
-		}
-		#endregion Methods - Get
+        public static List<AutoCommExcludeDate> GetAllFuture()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<AutoCommExcludeDate>>(MethodBase.GetCurrentMethod());
+            }
+            string command = $"SELECT * FROM autocommexcludedate WHERE DateExclude >= CURDATE() ORDER BY autocommexcludedate.DateExclude ASC";
+            return Crud.AutoCommExcludeDateCrud.SelectMany(command);
+        }
+        #endregion Methods - Get
 
-		#region Methods - Modify
-		///<summary></summary>
-		public static long Insert(AutoCommExcludeDate autoCommExcludeDate) {
-            if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-                autoCommExcludeDate.AutoCommExcludeDateNum=Meth.GetLong(MethodBase.GetCurrentMethod(),autoCommExcludeDate);
+        #region Methods - Modify
+        ///<summary></summary>
+        public static long Insert(AutoCommExcludeDate autoCommExcludeDate)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                autoCommExcludeDate.AutoCommExcludeDateNum = Meth.GetLong(MethodBase.GetCurrentMethod(), autoCommExcludeDate);
                 return autoCommExcludeDate.AutoCommExcludeDateNum;
             }
             return Crud.AutoCommExcludeDateCrud.Insert(autoCommExcludeDate);
         }
 
         ///<summary></summary>
-        public static void Delete(long autoCommExcludeDateNum) {
-            if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-                Meth.GetVoid(MethodBase.GetCurrentMethod(),autoCommExcludeDateNum);
+        public static void Delete(long autoCommExcludeDateNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), autoCommExcludeDateNum);
                 return;
             }
             Crud.AutoCommExcludeDateCrud.Delete(autoCommExcludeDateNum);

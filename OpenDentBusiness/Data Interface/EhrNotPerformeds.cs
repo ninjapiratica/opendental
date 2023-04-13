@@ -1,14 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class EhrNotPerformeds{
-		//If this table type will exist as cached data, uncomment the CachePattern region below.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class EhrNotPerformeds
+    {
+        //If this table type will exist as cached data, uncomment the CachePattern region below.
+        /*
 		#region CachePattern
 
 		private class EhrLabNotPerformedCache : CacheListAbs<EhrLabNotPerformed> {
@@ -87,49 +86,59 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary></summary>
-		public static List<EhrNotPerformed> Refresh(long patNum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<EhrNotPerformed>>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			string command="SELECT * FROM ehrnotperformed WHERE PatNum = "+POut.Long(patNum)+" ORDER BY DateEntry";
-			return Crud.EhrNotPerformedCrud.SelectMany(command);
-		}
+        ///<summary></summary>
+        public static List<EhrNotPerformed> Refresh(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<EhrNotPerformed>>(MethodBase.GetCurrentMethod(), patNum);
+            }
+            string command = "SELECT * FROM ehrnotperformed WHERE PatNum = " + POut.Long(patNum) + " ORDER BY DateEntry";
+            return Crud.EhrNotPerformedCrud.SelectMany(command);
+        }
 
-		///<summary></summary>
-		public static long Insert(EhrNotPerformed ehrNotPerformed){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				ehrNotPerformed.EhrNotPerformedNum=Meth.GetLong(MethodBase.GetCurrentMethod(),ehrNotPerformed);
-				return ehrNotPerformed.EhrNotPerformedNum;
-			}
-			return Crud.EhrNotPerformedCrud.Insert(ehrNotPerformed);
-		}
+        ///<summary></summary>
+        public static long Insert(EhrNotPerformed ehrNotPerformed)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                ehrNotPerformed.EhrNotPerformedNum = Meth.GetLong(MethodBase.GetCurrentMethod(), ehrNotPerformed);
+                return ehrNotPerformed.EhrNotPerformedNum;
+            }
+            return Crud.EhrNotPerformedCrud.Insert(ehrNotPerformed);
+        }
 
-		///<summary></summary>
-		public static void Update(EhrNotPerformed ehrNotPerformed){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),ehrNotPerformed);
-				return;
-			}
-			Crud.EhrNotPerformedCrud.Update(ehrNotPerformed);
-		}
+        ///<summary></summary>
+        public static void Update(EhrNotPerformed ehrNotPerformed)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), ehrNotPerformed);
+                return;
+            }
+            Crud.EhrNotPerformedCrud.Update(ehrNotPerformed);
+        }
 
-		///<summary></summary>
-		public static void Delete(long ehrNotPerformedNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),ehrNotPerformedNum);
-				return;
-			}
-			string command= "DELETE FROM ehrnotperformed WHERE EhrNotPerformedNum = "+POut.Long(ehrNotPerformedNum);
-			Db.NonQ(command);
-		}
+        ///<summary></summary>
+        public static void Delete(long ehrNotPerformedNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), ehrNotPerformedNum);
+                return;
+            }
+            string command = "DELETE FROM ehrnotperformed WHERE EhrNotPerformedNum = " + POut.Long(ehrNotPerformedNum);
+            Db.NonQ(command);
+        }
 
-		///<summary>Gets one EhrNotPerformed from the db.</summary>
-		public static EhrNotPerformed GetOne(long ehrNotPerformedNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<EhrNotPerformed>(MethodBase.GetCurrentMethod(),ehrNotPerformedNum);
-			}
-			return Crud.EhrNotPerformedCrud.SelectOne(ehrNotPerformedNum);
-		}
-	}
+        ///<summary>Gets one EhrNotPerformed from the db.</summary>
+        public static EhrNotPerformed GetOne(long ehrNotPerformedNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<EhrNotPerformed>(MethodBase.GetCurrentMethod(), ehrNotPerformedNum);
+            }
+            return Crud.EhrNotPerformedCrud.SelectOne(ehrNotPerformedNum);
+        }
+    }
 }

@@ -1,53 +1,61 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class PatientPortalInvites{
-		///<summary></summary>
-		public static List<PatientPortalInvite> Refresh(long patNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<PatientPortalInvite>>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			string command="SELECT * FROM patientportalinvite WHERE PatNum = "+POut.Long(patNum);
-			return Crud.PatientPortalInviteCrud.SelectMany(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class PatientPortalInvites
+    {
+        ///<summary></summary>
+        public static List<PatientPortalInvite> Refresh(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<PatientPortalInvite>>(MethodBase.GetCurrentMethod(), patNum);
+            }
+            string command = "SELECT * FROM patientportalinvite WHERE PatNum = " + POut.Long(patNum);
+            return Crud.PatientPortalInviteCrud.SelectMany(command);
+        }
 
-		///<summary>Gets a list of all PatientPortalInvites matching the passed in parameters. To get all PatientPortalInvites, pass in no parameters.
-		///</summary>
-		public static List<PatientPortalInvite> GetMany(params SQLWhere[] whereClause) {
-			List<SQLWhere> listWheres=new List<SQLWhere>();
-			foreach(SQLWhere where in whereClause) {
-				listWheres.Add(where);
-			}
-			return GetMany(listWheres);
-		}
+        ///<summary>Gets a list of all PatientPortalInvites matching the passed in parameters. To get all PatientPortalInvites, pass in no parameters.
+        ///</summary>
+        public static List<PatientPortalInvite> GetMany(params SQLWhere[] whereClause)
+        {
+            List<SQLWhere> listWheres = new List<SQLWhere>();
+            foreach (SQLWhere where in whereClause)
+            {
+                listWheres.Add(where);
+            }
+            return GetMany(listWheres);
+        }
 
-		///<summary>Gets a list of all PatientPortalInvites matching the passed in parameters.</summary>
-		public static List<PatientPortalInvite> GetMany(List<SQLWhere> listWheres) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<PatientPortalInvite>>(MethodBase.GetCurrentMethod(),listWheres);
-			}
-			string command="SELECT * FROM patientportalinvite ";
-			if(listWheres!=null && listWheres.Count > 0) {
-				command+="WHERE "+string.Join(" AND ",listWheres);
-			}
-			return Crud.PatientPortalInviteCrud.SelectMany(command);
-		}
+        ///<summary>Gets a list of all PatientPortalInvites matching the passed in parameters.</summary>
+        public static List<PatientPortalInvite> GetMany(List<SQLWhere> listWheres)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<PatientPortalInvite>>(MethodBase.GetCurrentMethod(), listWheres);
+            }
+            string command = "SELECT * FROM patientportalinvite ";
+            if (listWheres != null && listWheres.Count > 0)
+            {
+                command += "WHERE " + string.Join(" AND ", listWheres);
+            }
+            return Crud.PatientPortalInviteCrud.SelectMany(command);
+        }
 
-		///<summary></summary>
-		public static void InsertMany(List<PatientPortalInvite> listPatientPortalInvites) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPatientPortalInvites);
-				return;
-			}
-			Crud.PatientPortalInviteCrud.InsertMany(listPatientPortalInvites);
-		}
+        ///<summary></summary>
+        public static void InsertMany(List<PatientPortalInvite> listPatientPortalInvites)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), listPatientPortalInvites);
+                return;
+            }
+            Crud.PatientPortalInviteCrud.InsertMany(listPatientPortalInvites);
+        }
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 		#region Get Methods
 
@@ -98,5 +106,5 @@ namespace OpenDentBusiness{
 		
 		#endregion
 		*/
-	}
+    }
 }

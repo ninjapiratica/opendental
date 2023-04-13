@@ -1,14 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary>Cache pattern only used for updates.</summary>
-	public class Cdcrecs{
-		//If this table type will exist as cached data, uncomment the CachePattern region below.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary>Cache pattern only used for updates.</summary>
+    public class Cdcrecs
+    {
+        //If this table type will exist as cached data, uncomment the CachePattern region below.
+        /*
 		#region CachePattern
 
 		private class CdcrecCache : CacheListAbs<Cdcrec> {
@@ -87,56 +87,67 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary></summary>
-		public static long Insert(Cdcrec cdcrec){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				cdcrec.CdcrecNum=Meth.GetLong(MethodBase.GetCurrentMethod(),cdcrec);
-				return cdcrec.CdcrecNum;
-			}
-			return Crud.CdcrecCrud.Insert(cdcrec);
-		}
+        ///<summary></summary>
+        public static long Insert(Cdcrec cdcrec)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                cdcrec.CdcrecNum = Meth.GetLong(MethodBase.GetCurrentMethod(), cdcrec);
+                return cdcrec.CdcrecNum;
+            }
+            return Crud.CdcrecCrud.Insert(cdcrec);
+        }
 
-		///<summary></summary>
-		public static void Update(Cdcrec cdcrec){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),cdcrec);
-				return;
-			}
-			Crud.CdcrecCrud.Update(cdcrec);
-		}
-		
-		public static List<Cdcrec> GetAll() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<Cdcrec>>(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT * FROM cdcrec";
-			return Crud.CdcrecCrud.SelectMany(command);
-		}
+        ///<summary></summary>
+        public static void Update(Cdcrec cdcrec)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), cdcrec);
+                return;
+            }
+            Crud.CdcrecCrud.Update(cdcrec);
+        }
 
-		///<summary>Returns a list of just the codes for use in update or insert logic.</summary>
-		public static List<string> GetAllCodes() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod());
-			}
-			List<string> retVal=new List<string>();
-			string command="SELECT CdcRecCode FROM cdcrec";
-			DataTable table=DataCore.GetTable(command);
-			for(int i=0;i<table.Rows.Count;i++){
-				retVal.Add(table.Rows[i].ItemArray[0].ToString());
-			}
-			return retVal;
-		}		
+        public static List<Cdcrec> GetAll()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<Cdcrec>>(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT * FROM cdcrec";
+            return Crud.CdcrecCrud.SelectMany(command);
+        }
 
-		///<summary>Returns the total count of CDCREC codes.  CDCREC codes cannot be hidden.</summary>
-		public static long GetCodeCount() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetLong(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT COUNT(*) FROM cdcrec";
-			return PIn.Long(Db.GetCount(command));
-		}
+        ///<summary>Returns a list of just the codes for use in update or insert logic.</summary>
+        public static List<string> GetAllCodes()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod());
+            }
+            List<string> retVal = new List<string>();
+            string command = "SELECT CdcRecCode FROM cdcrec";
+            DataTable table = DataCore.GetTable(command);
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                retVal.Add(table.Rows[i].ItemArray[0].ToString());
+            }
+            return retVal;
+        }
 
-		/*
+        ///<summary>Returns the total count of CDCREC codes.  CDCREC codes cannot be hidden.</summary>
+        public static long GetCodeCount()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetLong(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT COUNT(*) FROM cdcrec";
+            return PIn.Long(Db.GetCount(command));
+        }
+
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -166,5 +177,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

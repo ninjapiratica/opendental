@@ -1,119 +1,140 @@
-using CDT;
 using CodeBase;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Linq;
 
-namespace OpenDentBusiness {
+namespace OpenDentBusiness
+{
 
-	///<summary>Used to keep track of which product keys have been assigned to which customers.  This class is designed for distributor installations.</summary>
-	public class RegistrationKeys {
-		///<summary>Retrieves all registration keys for a particular customer's family. There can be multiple keys assigned to a single customer, or keys
-		///assigned to individual family members, since the customer may have multiple physical locations of business.</summary>
-		public static RegistrationKey[] GetForPatient(long patNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<RegistrationKey[]>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			Family fam=Patients.GetFamily(patNum);
-			string command=$"SELECT * FROM registrationkey WHERE PatNum IN ({string.Join(",",fam.GetPatNums())})";
-			return Crud.RegistrationKeyCrud.SelectMany(command).ToArray();
-		}
+    ///<summary>Used to keep track of which product keys have been assigned to which customers.  This class is designed for distributor installations.</summary>
+    public class RegistrationKeys
+    {
+        ///<summary>Retrieves all registration keys for a particular customer's family. There can be multiple keys assigned to a single customer, or keys
+        ///assigned to individual family members, since the customer may have multiple physical locations of business.</summary>
+        public static RegistrationKey[] GetForPatient(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<RegistrationKey[]>(MethodBase.GetCurrentMethod(), patNum);
+            }
+            Family fam = Patients.GetFamily(patNum);
+            string command = $"SELECT * FROM registrationkey WHERE PatNum IN ({string.Join(",", fam.GetPatNums())})";
+            return Crud.RegistrationKeyCrud.SelectMany(command).ToArray();
+        }
 
-		///<summary>Updates the given key data to the database.</summary>
-		public static void Update(RegistrationKey registrationKey){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),registrationKey);
-				return;
-			}
-			Crud.RegistrationKeyCrud.Update(registrationKey);
-		}
+        ///<summary>Updates the given key data to the database.</summary>
+        public static void Update(RegistrationKey registrationKey)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), registrationKey);
+                return;
+            }
+            Crud.RegistrationKeyCrud.Update(registrationKey);
+        }
 
-		///<summary>Updates one RegistrationKey in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
-		public static bool Update(RegistrationKey registrationKey,RegistrationKey registrationKeyOld) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),registrationKey,registrationKeyOld);
-			}
-			return Crud.RegistrationKeyCrud.Update(registrationKey,registrationKeyOld);
-		}
+        ///<summary>Updates one RegistrationKey in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
+        public static bool Update(RegistrationKey registrationKey, RegistrationKey registrationKeyOld)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetBool(MethodBase.GetCurrentMethod(), registrationKey, registrationKeyOld);
+            }
+            return Crud.RegistrationKeyCrud.Update(registrationKey, registrationKeyOld);
+        }
 
-		///<summary>Inserts a new and unique registration key into the database.</summary>
-		public static long Insert(RegistrationKey registrationKey){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				registrationKey.RegistrationKeyNum=Meth.GetLong(MethodBase.GetCurrentMethod(),registrationKey);
-				return registrationKey.RegistrationKeyNum;
-			}
-			do{
-				if(registrationKey.IsForeign){
-					Random rand=new Random();
-					StringBuilder strBuild=new StringBuilder();
-					for(int i=0;i<16;i++){
-						int r=rand.Next(0,35);
-						if(r<10){
-							strBuild.Append((char)('0'+r));
-						}
-						else{
-							strBuild.Append((char)('A'+r-10));
-						}
-					}
-					registrationKey.RegKey=strBuild.ToString();
-				}
-				else{
-					registrationKey.RegKey=CDT.Class1.GenerateRandKey();
-				}
-				if(registrationKey.RegKey==""){
-					//Don't loop forever when software is unverified.
-					return 0;//not sure what consequence this would have.
-				}
-			} 
-			while(KeyIsInUse(registrationKey.RegKey));
-			return Crud.RegistrationKeyCrud.Insert(registrationKey);
-		}
+        ///<summary>Inserts a new and unique registration key into the database.</summary>
+        public static long Insert(RegistrationKey registrationKey)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                registrationKey.RegistrationKeyNum = Meth.GetLong(MethodBase.GetCurrentMethod(), registrationKey);
+                return registrationKey.RegistrationKeyNum;
+            }
+            do
+            {
+                if (registrationKey.IsForeign)
+                {
+                    Random rand = new Random();
+                    StringBuilder strBuild = new StringBuilder();
+                    for (int i = 0; i < 16; i++)
+                    {
+                        int r = rand.Next(0, 35);
+                        if (r < 10)
+                        {
+                            strBuild.Append((char)('0' + r));
+                        }
+                        else
+                        {
+                            strBuild.Append((char)('A' + r - 10));
+                        }
+                    }
+                    registrationKey.RegKey = strBuild.ToString();
+                }
+                else
+                {
+                    registrationKey.RegKey = CDT.Class1.GenerateRandKey();
+                }
+                if (registrationKey.RegKey == "")
+                {
+                    //Don't loop forever when software is unverified.
+                    return 0;//not sure what consequence this would have.
+                }
+            }
+            while (KeyIsInUse(registrationKey.RegKey));
+            return Crud.RegistrationKeyCrud.Insert(registrationKey);
+        }
 
-		public static void Delete(long registrationKeyNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),registrationKeyNum);
-				return;
-			}
-			string command="DELETE FROM registrationkey WHERE RegistrationKeyNum='"
-				+POut.Long(registrationKeyNum)+"'";
-			Db.NonQ(command);
-		}
+        public static void Delete(long registrationKeyNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), registrationKeyNum);
+                return;
+            }
+            string command = "DELETE FROM registrationkey WHERE RegistrationKeyNum='"
+                + POut.Long(registrationKeyNum) + "'";
+            Db.NonQ(command);
+        }
 
-		///<summary>Returns true if the given registration key is currently in use by a customer, false otherwise.</summary>
-		public static bool KeyIsInUse(string regKey) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),regKey);
-			}
-			string command="SELECT RegKey FROM registrationkey WHERE RegKey='"+POut.String(regKey)+"'";
-			DataTable table=Db.GetTable(command);
-			return (table.Rows.Count>0);
-		}
+        ///<summary>Returns true if the given registration key is currently in use by a customer, false otherwise.</summary>
+        public static bool KeyIsInUse(string regKey)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetBool(MethodBase.GetCurrentMethod(), regKey);
+            }
+            string command = "SELECT RegKey FROM registrationkey WHERE RegKey='" + POut.String(regKey) + "'";
+            DataTable table = Db.GetTable(command);
+            return (table.Rows.Count > 0);
+        }
 
-		///<summary></summary>
-		public static bool KeyIsEnabled(RegistrationKey registrationKey) {
-			//No need to check MiddleTierRole; no call to db.
-			if(registrationKey.DateDisabled.Year > 1880
-				|| registrationKey.DateStarted > DateTime.Today
-				|| (registrationKey.DateEnded.Year > 1880 && registrationKey.DateEnded < DateTime.Today)) 
-			{
-				return false;
-			}
-			return true;
-		}
+        ///<summary></summary>
+        public static bool KeyIsEnabled(RegistrationKey registrationKey)
+        {
+            //No need to check MiddleTierRole; no call to db.
+            if (registrationKey.DateDisabled.Year > 1880
+                || registrationKey.DateStarted > DateTime.Today
+                || (registrationKey.DateEnded.Year > 1880 && registrationKey.DateEnded < DateTime.Today))
+            {
+                return false;
+            }
+            return true;
+        }
 
-		///<Summary>Returns any active registration keys that have no repeating charges on any corresponding family members.  Columns include PatNum, LName, FName, and RegKey.</Summary>
-		public static DataTable GetAllWithoutCharges() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod());
-			}
-			#region Old Code
-			/*
+        ///<Summary>Returns any active registration keys that have no repeating charges on any corresponding family members.  Columns include PatNum, LName, FName, and RegKey.</Summary>
+        public static DataTable GetAllWithoutCharges()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetTable(MethodBase.GetCurrentMethod());
+            }
+            #region Old Code
+            /*
 			DataTable table=new DataTable();
 			table.Columns.Add("dateStop");
 			table.Columns.Add("family");
@@ -192,10 +213,10 @@ namespace OpenDentBusiness {
 			}
 			return table;
 			*/
-			#endregion
-			//The detailed queries above were taking far too long and were too complicated.
-			//Instead, we will look for any active registration keys that have no repeating charges on any corresponding family members.
-			string command=@"SELECT registrationkey.PatNum,registrationkey.RegKey,patient.LName,patient.FName
+            #endregion
+            //The detailed queries above were taking far too long and were too complicated.
+            //Instead, we will look for any active registration keys that have no repeating charges on any corresponding family members.
+            string command = @"SELECT registrationkey.PatNum,registrationkey.RegKey,patient.LName,patient.FName
 				FROM registrationkey
 				LEFT JOIN patient ON registrationkey.PatNum=patient.PatNum
 				LEFT JOIN (
@@ -211,70 +232,84 @@ namespace OpenDentBusiness {
 				AND registrationkey.IsFreeVersion=0 
 				AND registrationkey.IsOnlyForTesting=0
 				AND ISNULL(activecharges.PatNum)";
-			return Db.GetTable(command);
-		}
-		
-		///<summary>Does not validate regkey like GetByKey().
-		///Returns a dictionary such that the key is a registration key and the value is the patient.</summary>
-		public static SerializableDictionary<string,Patient> GetPatientsByKeys(List<string> listRegKeyStrs) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<SerializableDictionary<string,Patient>>(MethodBase.GetCurrentMethod(),listRegKeyStrs);
-			}
-			if(listRegKeyStrs==null || listRegKeyStrs.Count==0) {
-				return new SerializableDictionary<string, Patient>();
-			}
-			string command="SELECT * FROM  registrationkey WHERE RegKey IN("+String.Join(",",listRegKeyStrs.Distinct().Select(x => "'"+POut.String(x)+"'").ToList())+")";
-			List<RegistrationKey> listRegKeys=Crud.RegistrationKeyCrud.TableToList(Db.GetTable(command));
-			Patient[] pats=Patients.GetMultPats(listRegKeys.Select(x => x.PatNum).ToList());
-			return listRegKeys.Select(x => new { RegKeyStr=x.RegKey, PatientCur=pats.FirstOrDefault(y => y.PatNum==x.PatNum)??new Patient() })
-				.ToSerializableDictionary(x => x.RegKeyStr,x => x.PatientCur);
-		}
+            return Db.GetTable(command);
+        }
 
-		///<summary>Throws exceptions.</summary>
-		public static RegistrationKey GetByKey(string regKey) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<RegistrationKey>(MethodBase.GetCurrentMethod(),regKey);
-			}
-			if(!Regex.IsMatch(regKey,@"^[A-Z0-9]{16}$")) {
-				throw new ApplicationException("Invalid registration key format.");
-			}
-			string command="SELECT * FROM  registrationkey WHERE RegKey='"+POut.String(regKey)+"'";
-			RegistrationKey key=Crud.RegistrationKeyCrud.SelectOne(command);
-			if(key==null) {
-				throw new ApplicationException("Invalid registration key.");
-			}
-			return key;
-		}
-		
-		///<summary>Get the list of all RegistrationKey rows. DO NOT REMOVE! Used by OD WebApps solution.</summary>
-		public static List<RegistrationKey> GetAll() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<RegistrationKey>>(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT * FROM registrationkey";
-			return Crud.RegistrationKeyCrud.SelectMany(command);
-		}
+        ///<summary>Does not validate regkey like GetByKey().
+        ///Returns a dictionary such that the key is a registration key and the value is the patient.</summary>
+        public static SerializableDictionary<string, Patient> GetPatientsByKeys(List<string> listRegKeyStrs)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<SerializableDictionary<string, Patient>>(MethodBase.GetCurrentMethod(), listRegKeyStrs);
+            }
+            if (listRegKeyStrs == null || listRegKeyStrs.Count == 0)
+            {
+                return new SerializableDictionary<string, Patient>();
+            }
+            string command = "SELECT * FROM  registrationkey WHERE RegKey IN(" + String.Join(",", listRegKeyStrs.Distinct().Select(x => "'" + POut.String(x) + "'").ToList()) + ")";
+            List<RegistrationKey> listRegKeys = Crud.RegistrationKeyCrud.TableToList(Db.GetTable(command));
+            Patient[] pats = Patients.GetMultPats(listRegKeys.Select(x => x.PatNum).ToList());
+            return listRegKeys.Select(x => new { RegKeyStr = x.RegKey, PatientCur = pats.FirstOrDefault(y => y.PatNum == x.PatNum) ?? new Patient() })
+                .ToSerializableDictionary(x => x.RegKeyStr, x => x.PatientCur);
+        }
 
-		///<summary>Get the list of all RegistrationKey rows that have DateTBackupScheduled set in the future and a BackupPassCode set as well.</summary>
-		public static List<RegistrationKey> GetScheduledSupplementalBackups() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<RegistrationKey>>(MethodBase.GetCurrentMethod());
-			}
-			string command=$"SELECT * FROM registrationkey WHERE DateTBackupScheduled > {DbHelper.Now()}";
-			//Use C# to filter by BackupPassCode because we don't currently have an index for BackupPassCode in the database.
-			return Crud.RegistrationKeyCrud.SelectMany(command).FindAll(x => !string.IsNullOrWhiteSpace(x.BackupPassCode));
-		}
+        ///<summary>Throws exceptions.</summary>
+        public static RegistrationKey GetByKey(string regKey)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<RegistrationKey>(MethodBase.GetCurrentMethod(), regKey);
+            }
+            if (!Regex.IsMatch(regKey, @"^[A-Z0-9]{16}$"))
+            {
+                throw new ApplicationException("Invalid registration key format.");
+            }
+            string command = "SELECT * FROM  registrationkey WHERE RegKey='" + POut.String(regKey) + "'";
+            RegistrationKey key = Crud.RegistrationKeyCrud.SelectOne(command);
+            if (key == null)
+            {
+                throw new ApplicationException("Invalid registration key.");
+            }
+            return key;
+        }
 
-		///<summary>Get the list of all RegistrationKey rows that have the passed in RegistrationKeyNums.</summary>
-		public static List<RegistrationKey> GetByRegKeyNums(List<long> listRegKeyNums) {
-			if(listRegKeyNums.IsNullOrEmpty()) {
-				return new List<RegistrationKey>();
-			}
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<RegistrationKey>>(MethodBase.GetCurrentMethod(),listRegKeyNums);
-			}
-			string command=$"SELECT * FROM registrationkey WHERE RegistrationKeyNum IN({string.Join(",",listRegKeyNums.Select(x => POut.Long(x)))})";
-			return Crud.RegistrationKeyCrud.SelectMany(command);
-		}
-	}
+        ///<summary>Get the list of all RegistrationKey rows. DO NOT REMOVE! Used by OD WebApps solution.</summary>
+        public static List<RegistrationKey> GetAll()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<RegistrationKey>>(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT * FROM registrationkey";
+            return Crud.RegistrationKeyCrud.SelectMany(command);
+        }
+
+        ///<summary>Get the list of all RegistrationKey rows that have DateTBackupScheduled set in the future and a BackupPassCode set as well.</summary>
+        public static List<RegistrationKey> GetScheduledSupplementalBackups()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<RegistrationKey>>(MethodBase.GetCurrentMethod());
+            }
+            string command = $"SELECT * FROM registrationkey WHERE DateTBackupScheduled > {DbHelper.Now()}";
+            //Use C# to filter by BackupPassCode because we don't currently have an index for BackupPassCode in the database.
+            return Crud.RegistrationKeyCrud.SelectMany(command).FindAll(x => !string.IsNullOrWhiteSpace(x.BackupPassCode));
+        }
+
+        ///<summary>Get the list of all RegistrationKey rows that have the passed in RegistrationKeyNums.</summary>
+        public static List<RegistrationKey> GetByRegKeyNums(List<long> listRegKeyNums)
+        {
+            if (listRegKeyNums.IsNullOrEmpty())
+            {
+                return new List<RegistrationKey>();
+            }
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<RegistrationKey>>(MethodBase.GetCurrentMethod(), listRegKeyNums);
+            }
+            string command = $"SELECT * FROM registrationkey WHERE RegistrationKeyNum IN({string.Join(",", listRegKeyNums.Select(x => POut.Long(x)))})";
+            return Crud.RegistrationKeyCrud.SelectMany(command);
+        }
+    }
 }

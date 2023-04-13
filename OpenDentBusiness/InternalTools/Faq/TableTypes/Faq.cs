@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OpenDentBusiness {
-	[Serializable()]
-	[CrudTable(IsMissingInGeneral=true)]
-    public class Faq:TableBase {
+namespace OpenDentBusiness
+{
+    [Serializable()]
+    [CrudTable(IsMissingInGeneral = true)]
+    public class Faq : TableBase
+    {
         ///<summary>Primary key.</summary>
-        [CrudColumn(IsPriKey=true)]
+        [CrudColumn(IsPriKey = true)]
         public long FaqNum;
         ///<summary>The question part of the FAQ.</summary>
         public string QuestionText;
@@ -24,11 +22,12 @@ namespace OpenDentBusiness {
         ///<summary>Optional URL path to an image.</summary>
         public string ImageUrl;
         ///<summary></summary>
-		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
+		[CrudColumn(SpecialType = CrudSpecialColType.DateTEntry)]
         public DateTime DateTEntry;
 
         ///<summary></summary>
-        public Faq Copy() {
+        public Faq Copy()
+        {
             return (Faq)this.MemberwiseClone();
         }
     }

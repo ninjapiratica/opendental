@@ -1,14 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class GradingScaleItems{
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class GradingScaleItems
+    {
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 
 		private class GradingScaleItemCache : CacheListAbs<GradingScaleItem> {
@@ -87,60 +86,72 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary>Gets all grading scale items ordered by GradeNumber descending.</summary>
-		public static List<GradingScaleItem> Refresh(long gradingScaleNum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<GradingScaleItem>>(MethodBase.GetCurrentMethod(),gradingScaleNum);
-			}
-			string command="SELECT * FROM gradingscaleitem WHERE GradingScaleNum = "+POut.Long(gradingScaleNum)
-				+" ORDER BY GradeNumber DESC";
-			return Crud.GradingScaleItemCrud.SelectMany(command);
-		}
+        ///<summary>Gets all grading scale items ordered by GradeNumber descending.</summary>
+        public static List<GradingScaleItem> Refresh(long gradingScaleNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<GradingScaleItem>>(MethodBase.GetCurrentMethod(), gradingScaleNum);
+            }
+            string command = "SELECT * FROM gradingscaleitem WHERE GradingScaleNum = " + POut.Long(gradingScaleNum)
+                + " ORDER BY GradeNumber DESC";
+            return Crud.GradingScaleItemCrud.SelectMany(command);
+        }
 
-		///<summary>Gets one GradingScaleItem from the db.</summary>
-		public static GradingScaleItem GetOne(long gradingScaleItemNum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				return Meth.GetObject<GradingScaleItem>(MethodBase.GetCurrentMethod(),gradingScaleItemNum);
-			}
-			return Crud.GradingScaleItemCrud.SelectOne(gradingScaleItemNum);
-		}
+        ///<summary>Gets one GradingScaleItem from the db.</summary>
+        public static GradingScaleItem GetOne(long gradingScaleItemNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<GradingScaleItem>(MethodBase.GetCurrentMethod(), gradingScaleItemNum);
+            }
+            return Crud.GradingScaleItemCrud.SelectOne(gradingScaleItemNum);
+        }
 
-		///<summary></summary>
-		public static long Insert(GradingScaleItem gradingScaleItem){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				gradingScaleItem.GradingScaleItemNum=Meth.GetLong(MethodBase.GetCurrentMethod(),gradingScaleItem);
-				return gradingScaleItem.GradingScaleItemNum;
-			}
-			return Crud.GradingScaleItemCrud.Insert(gradingScaleItem);
-		}
+        ///<summary></summary>
+        public static long Insert(GradingScaleItem gradingScaleItem)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                gradingScaleItem.GradingScaleItemNum = Meth.GetLong(MethodBase.GetCurrentMethod(), gradingScaleItem);
+                return gradingScaleItem.GradingScaleItemNum;
+            }
+            return Crud.GradingScaleItemCrud.Insert(gradingScaleItem);
+        }
 
-		///<summary></summary>
-		public static void Update(GradingScaleItem gradingScaleItem){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),gradingScaleItem);
-				return;
-			}
-			Crud.GradingScaleItemCrud.Update(gradingScaleItem);
-		}
+        ///<summary></summary>
+        public static void Update(GradingScaleItem gradingScaleItem)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), gradingScaleItem);
+                return;
+            }
+            Crud.GradingScaleItemCrud.Update(gradingScaleItem);
+        }
 
-		///<summary></summary>
-		public static void DeleteAllByGradingScale(long gradingScaleNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),gradingScaleNum);
-				return;
-			}
-			string command= "DELETE FROM gradingscaleitem WHERE GradingScaleNum = "+POut.Long(gradingScaleNum);
-			Db.NonQ(command);
-		}
+        ///<summary></summary>
+        public static void DeleteAllByGradingScale(long gradingScaleNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), gradingScaleNum);
+                return;
+            }
+            string command = "DELETE FROM gradingscaleitem WHERE GradingScaleNum = " + POut.Long(gradingScaleNum);
+            Db.NonQ(command);
+        }
 
-		///<summary></summary>
-		public static void Delete(long gradingScaleItemNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),gradingScaleItemNum);
-				return;
-			}
-			string command= "DELETE FROM gradingscaleitem WHERE GradingScaleItemNum = "+POut.Long(gradingScaleItemNum);
-			Db.NonQ(command);
-		}
-	}
+        ///<summary></summary>
+        public static void Delete(long gradingScaleItemNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), gradingScaleItemNum);
+                return;
+            }
+            string command = "DELETE FROM gradingscaleitem WHERE GradingScaleItemNum = " + POut.Long(gradingScaleItemNum);
+            Db.NonQ(command);
+        }
+    }
 }

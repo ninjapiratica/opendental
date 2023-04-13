@@ -1,28 +1,31 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace OpenDentBusiness {
-	///<summary>This class will likely never be used.  The famaging table is used to store intermediate calculations for aging and once the patient
-	///table is updated the data is never accessed again.  A new aging calculation begins with truncating this table.  All edit commands, i.e. truncate,
-	///insert, etc., take place in the queries in Ledgers.ComputeAging.</summary>
-	public class FamAgings {		
-		#region Insert
+namespace OpenDentBusiness
+{
+    ///<summary>This class will likely never be used.  The famaging table is used to store intermediate calculations for aging and once the patient
+    ///table is updated the data is never accessed again.  A new aging calculation begins with truncating this table.  All edit commands, i.e. truncate,
+    ///insert, etc., take place in the queries in Ledgers.ComputeAging.</summary>
+    public class FamAgings
+    {
+        #region Insert
 
-		///<summary>Inserts many into the FamAging table.  Uses the existing pri key since these are basically copies of the patient table data and should
-		///always be inserted using the patient.PatNum as the pri key value in order to join on the patient table for update later.</summary>
-		public static void InsertMany(List<FamAging> listFamAgings) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listFamAgings);
-				return;
-			}
-			Crud.FamAgingCrud.InsertMany(listFamAgings,true);//true to use existing pri key so these will match the patient.PatNums for joining later
-		}
+        ///<summary>Inserts many into the FamAging table.  Uses the existing pri key since these are basically copies of the patient table data and should
+        ///always be inserted using the patient.PatNum as the pri key value in order to join on the patient table for update later.</summary>
+        public static void InsertMany(List<FamAging> listFamAgings)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), listFamAgings);
+                return;
+            }
+            Crud.FamAgingCrud.InsertMany(listFamAgings, true);//true to use existing pri key so these will match the patient.PatNums for joining later
+        }
 
-		#endregion
+        #endregion
 
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 
 		private class FamAgingCache : CacheListAbs<FamAging> {
@@ -100,7 +103,7 @@ namespace OpenDentBusiness {
 
 		#endregion
 		*/
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -151,5 +154,5 @@ namespace OpenDentBusiness {
 
 		
 		*/
-	}
+    }
 }

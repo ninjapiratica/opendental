@@ -1,34 +1,37 @@
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class DispSupplies{
-		///<summary></summary>
-		public static DataTable RefreshDispensary(long provNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),provNum);
-			}
-			string command="SELECT supply.Descript,dispsupply.DateDispensed,dispsupply.DispQuantity,dispsupply.Note "
-				+"FROM dispsupply LEFT JOIN supply ON dispsupply.SupplyNum=supply.SupplyNum "
-					+"WHERE dispsupply.ProvNum="+POut.Long(provNum)+" "
-					+"ORDER BY DateDispensed,Descript";
-			return Db.GetTable(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class DispSupplies
+    {
+        ///<summary></summary>
+        public static DataTable RefreshDispensary(long provNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetTable(MethodBase.GetCurrentMethod(), provNum);
+            }
+            string command = "SELECT supply.Descript,dispsupply.DateDispensed,dispsupply.DispQuantity,dispsupply.Note "
+                + "FROM dispsupply LEFT JOIN supply ON dispsupply.SupplyNum=supply.SupplyNum "
+                    + "WHERE dispsupply.ProvNum=" + POut.Long(provNum) + " "
+                    + "ORDER BY DateDispensed,Descript";
+            return Db.GetTable(command);
+        }
 
-		///<summary></summary>
-		public static long Insert(DispSupply dispSupply){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				dispSupply.DispSupplyNum=Meth.GetLong(MethodBase.GetCurrentMethod(),dispSupply);
-				return dispSupply.DispSupplyNum;
-			}
-			return Crud.DispSupplyCrud.Insert(dispSupply);
-		}
+        ///<summary></summary>
+        public static long Insert(DispSupply dispSupply)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                dispSupply.DispSupplyNum = Meth.GetLong(MethodBase.GetCurrentMethod(), dispSupply);
+                return dispSupply.DispSupplyNum;
+            }
+            return Crud.DispSupplyCrud.Insert(dispSupply);
+        }
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -69,5 +72,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

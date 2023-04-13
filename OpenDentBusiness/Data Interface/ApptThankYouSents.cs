@@ -1,88 +1,100 @@
-using System;
+using CodeBase;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using CodeBase;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class ApptThankYouSents{
-		public const string ADD_TO_CALENDAR="[AddToCalendar]";
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class ApptThankYouSents
+    {
+        public const string ADD_TO_CALENDAR = "[AddToCalendar]";
 
-		public static List<ApptThankYouSent> GetForApt(long aptNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<ApptThankYouSent>>(MethodBase.GetCurrentMethod(),aptNum);
-			}
-			string command="SELECT * FROM apptthankyousent WHERE ApptNum="+POut.Long(aptNum);
-			return Crud.ApptThankYouSentCrud.SelectMany(command);
-		}
+        public static List<ApptThankYouSent> GetForApt(long aptNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<ApptThankYouSent>>(MethodBase.GetCurrentMethod(), aptNum);
+            }
+            string command = "SELECT * FROM apptthankyousent WHERE ApptNum=" + POut.Long(aptNum);
+            return Crud.ApptThankYouSentCrud.SelectMany(command);
+        }
 
-		public static void InsertMany(List<ApptThankYouSent> listApptThankYouSents) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listApptThankYouSents);
-				return;
-			}
-			Crud.ApptThankYouSentCrud.InsertMany(listApptThankYouSents);
-		}
+        public static void InsertMany(List<ApptThankYouSent> listApptThankYouSents)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), listApptThankYouSents);
+                return;
+            }
+            Crud.ApptThankYouSentCrud.InsertMany(listApptThankYouSents);
+        }
 
-		#region Update
-		///<summary></summary>
-		public static void Update(ApptThankYouSent apptThankYouSent){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),apptThankYouSent);
-				return;
-			}
-			Crud.ApptThankYouSentCrud.Update(apptThankYouSent);
-		}
-		#endregion Update
+        #region Update
+        ///<summary></summary>
+        public static void Update(ApptThankYouSent apptThankYouSent)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), apptThankYouSent);
+                return;
+            }
+            Crud.ApptThankYouSentCrud.Update(apptThankYouSent);
+        }
+        #endregion Update
 
-		#region Delete
-		///<summary></summary>
-		public static void Delete(params long[] arrApptThankYouSentNums) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),arrApptThankYouSentNums);
-				return;
-			}
-			if(arrApptThankYouSentNums.IsNullOrEmpty()) {
-				return;
-			}
-			string command="DELETE FROM apptthankyousent WHERE ApptThankYouSentNum IN ("
-				+string.Join(",",arrApptThankYouSentNums.Select(x => POut.Long(x)))+")";
-			Db.NonQ(command);
-		}
-		#endregion Delete
+        #region Delete
+        ///<summary></summary>
+        public static void Delete(params long[] arrApptThankYouSentNums)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), arrApptThankYouSentNums);
+                return;
+            }
+            if (arrApptThankYouSentNums.IsNullOrEmpty())
+            {
+                return;
+            }
+            string command = "DELETE FROM apptthankyousent WHERE ApptThankYouSentNum IN ("
+                + string.Join(",", arrApptThankYouSentNums.Select(x => POut.Long(x))) + ")";
+            Db.NonQ(command);
+        }
+        #endregion Delete
 
-		public static void HandleApptChanged(Logger.IWriteLine log) {
-			//Delete the ApptThankYouSent entries for rescheduled/cancelled appointments.  AutoComm will resend these automatically where the appointment 
-			//still and HQ will increment the Sequence number of the .ics file such that the calendar entry on the patient's device is updated.
-			//Remove those that the user specifically said to not resend
-			List<ApptThankYouSent> listThanksChanged=GetForApptChanged();
-			log.WriteLine($"Deleting {listThanksChanged.Count} ApptThankYouSent entries.",LogLevel.Information);
-			string verboseLog=string.Join("\r\n\t\t",listThanksChanged
-				.Select(x => $"ApptThankYouSentNum: {x.ApptThankYouSentNum}, PatNum: {x.PatNum}, ApptDateTime: {x.ApptDateTime}"));
-			log.WriteLine($"Deleting \r\n\t\t{verboseLog}",LogLevel.Verbose);
-			Delete(listThanksChanged.Select(x => x.ApptThankYouSentNum).ToArray());
-		}
+        public static void HandleApptChanged(Logger.IWriteLine log)
+        {
+            //Delete the ApptThankYouSent entries for rescheduled/cancelled appointments.  AutoComm will resend these automatically where the appointment 
+            //still and HQ will increment the Sequence number of the .ics file such that the calendar entry on the patient's device is updated.
+            //Remove those that the user specifically said to not resend
+            List<ApptThankYouSent> listThanksChanged = GetForApptChanged();
+            log.WriteLine($"Deleting {listThanksChanged.Count} ApptThankYouSent entries.", LogLevel.Information);
+            string verboseLog = string.Join("\r\n\t\t", listThanksChanged
+                .Select(x => $"ApptThankYouSentNum: {x.ApptThankYouSentNum}, PatNum: {x.PatNum}, ApptDateTime: {x.ApptDateTime}"));
+            log.WriteLine($"Deleting \r\n\t\t{verboseLog}", LogLevel.Verbose);
+            Delete(listThanksChanged.Select(x => x.ApptThankYouSentNum).ToArray());
+        }
 
-		//<summary>Get the list of ApptThankYouSents where the appointment was rescheduled or cancelled after sending the thank you.</summary>
-		public static List<ApptThankYouSent> GetForApptChanged() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<ApptThankYouSent>>(MethodBase.GetCurrentMethod());
-			}
-			//Do not include UnscheduledList or Broken appointments
-			List<ApptStatus> listStatus=new List<ApptStatus>() { ApptStatus.UnschedList, ApptStatus.Broken };
-			string command=@"SELECT apptthankyousent.* 
+        //<summary>Get the list of ApptThankYouSents where the appointment was rescheduled or cancelled after sending the thank you.</summary>
+        public static List<ApptThankYouSent> GetForApptChanged()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<ApptThankYouSent>>(MethodBase.GetCurrentMethod());
+            }
+            //Do not include UnscheduledList or Broken appointments
+            List<ApptStatus> listStatus = new List<ApptStatus>() { ApptStatus.UnschedList, ApptStatus.Broken };
+            string command = @"SELECT apptthankyousent.* 
 				FROM apptthankyousent
 				LEFT JOIN appointment ON apptthankyousent.ApptNum=appointment.AptNum
 				WHERE apptthankyousent.DoNotResend=0 AND (appointment.AptNum IS NULL OR appointment.AptDateTime!=apptthankyousent.ApptDateTime
-				OR appointment.AptStatus IN ("+string.Join(",",listStatus.Select(x => POut.Int((int)x)))+"))";
-			return Crud.ApptThankYouSentCrud.SelectMany(command);
-		}
+				OR appointment.AptStatus IN (" + string.Join(",", listStatus.Select(x => POut.Int((int)x))) + "))";
+            return Crud.ApptThankYouSentCrud.SelectMany(command);
+        }
 
-		//If this table type will exist as cached data, uncomment the Cache Pattern region below and edit.
-		/*
+        //If this table type will exist as cached data, uncomment the Cache Pattern region below and edit.
+        /*
 		#region Cache Pattern
 		//This region can be eliminated if this is not a table type with cached data.
 		//If leaving this region in place, be sure to add GetTableFromCache and FillCacheFromTable to the Cache.cs file with all the other Cache types.
@@ -171,7 +183,7 @@ namespace OpenDentBusiness{
 		}
 		#endregion Cache Pattern
 		*/
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 		#region Get Methods
 		///<summary></summary>
@@ -209,5 +221,5 @@ namespace OpenDentBusiness{
 		
 		#endregion Misc Methods
 		*/
-	}
+    }
 }

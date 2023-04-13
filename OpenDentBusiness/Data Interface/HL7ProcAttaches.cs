@@ -1,22 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class HL7ProcAttaches{
-		///<summary></summary>
-		public static long Insert(HL7ProcAttach hL7ProcAttach) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				hL7ProcAttach.HL7ProcAttachNum=Meth.GetLong(MethodBase.GetCurrentMethod(),hL7ProcAttach);
-				return hL7ProcAttach.HL7ProcAttachNum;
-			}
-			return Crud.HL7ProcAttachCrud.Insert(hL7ProcAttach);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class HL7ProcAttaches
+    {
+        ///<summary></summary>
+        public static long Insert(HL7ProcAttach hL7ProcAttach)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                hL7ProcAttach.HL7ProcAttachNum = Meth.GetLong(MethodBase.GetCurrentMethod(), hL7ProcAttach);
+                return hL7ProcAttach.HL7ProcAttachNum;
+            }
+            return Crud.HL7ProcAttachCrud.Insert(hL7ProcAttach);
+        }
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -55,5 +55,5 @@ namespace OpenDentBusiness{
 		}
 				
 		*/
-	}
+    }
 }

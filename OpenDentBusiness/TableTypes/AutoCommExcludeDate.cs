@@ -1,15 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace OpenDentBusiness {
+namespace OpenDentBusiness
+{
     /// <summary>AutoComms are sent a certain number of days in advance. Clinicpref called eConfirmExcludeDays handles excluding weekends, and this table handles excluding holidays. So AutoComms only go out when office is open. (First iteration currently only applies to eConfirmations)</summary>
-    public class AutoCommExcludeDate : TableBase {
+    public class AutoCommExcludeDate : TableBase
+    {
         ///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey = true)]
         public long AutoCommExcludeDateNum;
         /// <summary>ClinicNum this row applies to. 0 for HQ</summary>
         public long ClinicNum;
-        [CrudColumn(SpecialType=CrudSpecialColType.DateT)]
+        [CrudColumn(SpecialType = CrudSpecialColType.DateT)]
         /// <summary>Date for which Auto Communications will not be sent.</summary>
         public DateTime DateExclude;
 
@@ -17,7 +19,8 @@ namespace OpenDentBusiness {
         /// One can translate a 0 based array of Days of the Week using calculations listed below.
         /// No one should ever have their preference set to include all 7 days. NEVER DO THIS.</summary>
         [Flags]
-        public enum AutoCommExcludeDays {
+        public enum AutoCommExcludeDays
+        {
             /// <summary>Indicates that no days are selected to be excluded</summary>
             [Description("None")]
             None = 0,
@@ -45,8 +48,10 @@ namespace OpenDentBusiness {
         }
 
 
-        public static AutoCommExcludeDays ConvertDayToAutoCommExcludeDays(DayOfWeek dt) {
-            switch(dt) {
+        public static AutoCommExcludeDays ConvertDayToAutoCommExcludeDays(DayOfWeek dt)
+        {
+            switch (dt)
+            {
                 case DayOfWeek.Sunday:
                     return AutoCommExcludeDays.Sunday;
                 case DayOfWeek.Monday:

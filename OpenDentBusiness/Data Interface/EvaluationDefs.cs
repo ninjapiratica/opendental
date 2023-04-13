@@ -1,14 +1,14 @@
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class EvaluationDefs{
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class EvaluationDefs
+    {
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 
 		private class EvaluationDefCache : CacheListAbs<EvaluationDef> {
@@ -87,66 +87,79 @@ namespace OpenDentBusiness{
 		#endregion
 		*/
 
-		///<summary>Gets all EvaluationDefs from the DB.</summary>
-		public static List<EvaluationDef> Refresh(){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<EvaluationDef>>(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT * FROM evaluationdef";
-			return Crud.EvaluationDefCrud.SelectMany(command);
-		}
+        ///<summary>Gets all EvaluationDefs from the DB.</summary>
+        public static List<EvaluationDef> Refresh()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<EvaluationDef>>(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT * FROM evaluationdef";
+            return Crud.EvaluationDefCrud.SelectMany(command);
+        }
 
-		///<summary>Gets all EvaluationDefs from the DB that are attached to the specified course. If course is blank then it will get all of the defs.</summary>
-		public static DataTable GetAllByCourse(long schoolCourseNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),schoolCourseNum);
-			}
-			string command="SELECT evaluationdef.EvaluationDefNum, evaluationdef.EvalTitle, schoolcourse.CourseID FROM evaluationdef "
-				+"INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluationdef.SchoolCourseNum "
-				+"WHERE TRUE";
-			if(schoolCourseNum!=0) {
-				command+=" AND schoolcourse.SchoolCourseNum = '"+POut.Long(schoolCourseNum)+"'";
-			}
-			command+=" ORDER BY CourseID,EvalTitle";
-			return Db.GetTable(command);
-		}
+        ///<summary>Gets all EvaluationDefs from the DB that are attached to the specified course. If course is blank then it will get all of the defs.</summary>
+        public static DataTable GetAllByCourse(long schoolCourseNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetTable(MethodBase.GetCurrentMethod(), schoolCourseNum);
+            }
+            string command = "SELECT evaluationdef.EvaluationDefNum, evaluationdef.EvalTitle, schoolcourse.CourseID FROM evaluationdef "
+                + "INNER JOIN schoolcourse ON schoolcourse.SchoolCourseNum=evaluationdef.SchoolCourseNum "
+                + "WHERE TRUE";
+            if (schoolCourseNum != 0)
+            {
+                command += " AND schoolcourse.SchoolCourseNum = '" + POut.Long(schoolCourseNum) + "'";
+            }
+            command += " ORDER BY CourseID,EvalTitle";
+            return Db.GetTable(command);
+        }
 
-		///<summary>Gets one EvaluationDef from the db.</summary>
-		public static EvaluationDef GetOne(long evaluationDefNum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				return Meth.GetObject<EvaluationDef>(MethodBase.GetCurrentMethod(),evaluationDefNum);
-			}
-			return Crud.EvaluationDefCrud.SelectOne(evaluationDefNum);
-		}
+        ///<summary>Gets one EvaluationDef from the db.</summary>
+        public static EvaluationDef GetOne(long evaluationDefNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<EvaluationDef>(MethodBase.GetCurrentMethod(), evaluationDefNum);
+            }
+            return Crud.EvaluationDefCrud.SelectOne(evaluationDefNum);
+        }
 
-		///<summary></summary>
-		public static long Insert(EvaluationDef evaluationDef){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				evaluationDef.EvaluationDefNum=Meth.GetLong(MethodBase.GetCurrentMethod(),evaluationDef);
-				return evaluationDef.EvaluationDefNum;
-			}
-			return Crud.EvaluationDefCrud.Insert(evaluationDef);
-		}
+        ///<summary></summary>
+        public static long Insert(EvaluationDef evaluationDef)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                evaluationDef.EvaluationDefNum = Meth.GetLong(MethodBase.GetCurrentMethod(), evaluationDef);
+                return evaluationDef.EvaluationDefNum;
+            }
+            return Crud.EvaluationDefCrud.Insert(evaluationDef);
+        }
 
-		///<summary></summary>
-		public static void Update(EvaluationDef evaluationDef){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),evaluationDef);
-				return;
-			}
-			Crud.EvaluationDefCrud.Update(evaluationDef);
-		}
+        ///<summary></summary>
+        public static void Update(EvaluationDef evaluationDef)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), evaluationDef);
+                return;
+            }
+            Crud.EvaluationDefCrud.Update(evaluationDef);
+        }
 
-		///<summary>Deletes an EvaluationDef and all EvaluationCriterionDefs attached to it.</summary>
-		public static void Delete(long evaluationDefNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),evaluationDefNum);
-				return;
-			}
-			string command= "DELETE FROM evaluationdef WHERE EvaluationDefNum = "+POut.Long(evaluationDefNum);
-			Db.NonQ(command);
-			command= "DELETE FROM evaluationcriteriondef WHERE EvaluationDefNum = "+POut.Long(evaluationDefNum);
-			Db.NonQ(command);
-		}
-	}
+        ///<summary>Deletes an EvaluationDef and all EvaluationCriterionDefs attached to it.</summary>
+        public static void Delete(long evaluationDefNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), evaluationDefNum);
+                return;
+            }
+            string command = "DELETE FROM evaluationdef WHERE EvaluationDefNum = " + POut.Long(evaluationDefNum);
+            Db.NonQ(command);
+            command = "DELETE FROM evaluationcriteriondef WHERE EvaluationDefNum = " + POut.Long(evaluationDefNum);
+            Db.NonQ(command);
+        }
+    }
 }

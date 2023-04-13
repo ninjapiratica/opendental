@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OpenDentBusiness {
-	public class RpServiceDateView {
-		public static DataTable GetData(long patNum,bool isFamily,bool isDetailed) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),patNum,isFamily,isDetailed);
-			}
-			int payPlanVersion=PIn.Int(PrefC.GetStringNoCache(PrefName.PayPlansVersion));
-			if(payPlanVersion==0) {
-				payPlanVersion=1;
-			}
-			string command=$@"
+namespace OpenDentBusiness
+{
+    public class RpServiceDateView
+    {
+        public static DataTable GetData(long patNum, bool isFamily, bool isDetailed)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetTable(MethodBase.GetCurrentMethod(), patNum, isFamily, isDetailed);
+            }
+            int payPlanVersion = PIn.Int(PrefC.GetStringNoCache(PrefName.PayPlansVersion));
+            if (payPlanVersion == 0)
+            {
+                payPlanVersion = 1;
+            }
+            string command = $@"
 				/*top layer gets final columns for display*/
 				SELECT
 					IF(display.TranDate != '', '',display.ProcDate) AS 'Date',
@@ -94,7 +94,7 @@ namespace OpenDentBusiness {
 						WHEN 3
 							THEN CONCAT(REPEAT(' ',2),'Total for Date')
 						WHEN 4
-							THEN {(isFamily ? "'Family Total:'" : "'Patient Total:'" )}
+							THEN {(isFamily ? "'Family Total:'" : "'Patient Total:'")}
 					END) AS 'Reference',
 					(CASE dup.Num
 						WHEN 1
@@ -128,7 +128,7 @@ namespace OpenDentBusiness {
 					END) AS 'Pvdr',
 					(CASE dup.Num
 						WHEN 1
-							THEN {(isDetailed ? "IF(core.Type = 'Proc', FORMAT(core.InsCredits,2),'')": "''")} 
+							THEN {(isDetailed ? "IF(core.Type = 'Proc', FORMAT(core.InsCredits,2),'')" : "''")} 
 						WHEN 2
 							THEN '' -- intentionally blank
 						WHEN 3
@@ -149,7 +149,7 @@ namespace OpenDentBusiness {
 					TranNum,
 					PatNum
 				FROM(
-				  {GetCoreQuery(patNum,isFamily,payPlanVersion)}
+				  {GetCoreQuery(patNum, isFamily, payPlanVersion)}
 				) core
 				INNER JOIN(
 				/*add 2 extra rows to every transaction so we can use the data more than once for per day and overall totals without running the query again*/
@@ -180,17 +180,18 @@ namespace OpenDentBusiness {
 					display.TranDate,
 					FIELD(display.Type,'Proc','Adj-Att.','PatPay Att.','WriteOff-Att.','InsPay-Att.','PayPlan Charge Att.','PatPay Att. PayPlan','Unallocated','PatPay','WriteOff','Adj','InsPay','PayPlan Credit','Dynamic PayPlan Credit','PayPlan Charge','PatPay PayPlan','Day Total','Overall Total')
 			";
-			return ReportsComplex.RunFuncOnReportServer(() => Db.GetTable(command));
-		}
+            return ReportsComplex.RunFuncOnReportServer(() => Db.GetTable(command));
+        }
 
-		///<summary>Get core data ordered by procedure date and transactions attached to procs first, with specific ordering for transaction type. 
-		///Using aging preference to get payment plan info. Defining transaction type separate from reference for specific ordering.</summary>
-		private static string GetCoreQuery(long patNum,bool isFamily,int payPlanVersion) {
-			//no remoting role check. Private method.
-			string wherePatOrFam=isFamily ? $"patient.Guarantor={POut.Long(patNum)}":$"patient.PatNum={POut.Long(patNum)}";
-			#region Procedures
-			//Get all completed procedures for patient/family with charges and credits. Also includes separate column for insurance credits only.
-			string command=$@"SELECT 'Proc' AS 'Type', 
+        ///<summary>Get core data ordered by procedure date and transactions attached to procs first, with specific ordering for transaction type. 
+        ///Using aging preference to get payment plan info. Defining transaction type separate from reference for specific ordering.</summary>
+        private static string GetCoreQuery(long patNum, bool isFamily, int payPlanVersion)
+        {
+            //no remoting role check. Private method.
+            string wherePatOrFam = isFamily ? $"patient.Guarantor={POut.Long(patNum)}" : $"patient.PatNum={POut.Long(patNum)}";
+            #region Procedures
+            //Get all completed procedures for patient/family with charges and credits. Also includes separate column for insurance credits only.
+            string command = $@"SELECT 'Proc' AS 'Type', 
 				procedurelog.ProcNum AS 'TranNum', 
 				procedurelog.ProcDate, 
 				'0001-01-01' AS 'TranDate', 
@@ -217,10 +218,10 @@ namespace OpenDentBusiness {
 				INNER JOIN patient ON patient.PatNum=procedurelog.PatNum 
 				WHERE procedurelog.ProcStatus={POut.Int((int)ProcStat.C)} 
 				AND {wherePatOrFam} ";
-			#endregion
-			#region Adjustment
-			//Get all adjustment for patient/family. Positive adjustment as Charges and negative adjustments as Credits. 
-			command+=$@"
+            #endregion
+            #region Adjustment
+            //Get all adjustment for patient/family. Positive adjustment as Charges and negative adjustments as Credits. 
+            command += $@"
 				UNION ALL
 				SELECT IF(adjustment.ProcNum > 0,'Adj-Att.','Adj') AS 'Type',
 				adjustment.AdjNum AS 'TranNum',
@@ -239,10 +240,10 @@ namespace OpenDentBusiness {
 				FROM adjustment 
 				INNER JOIN patient ON patient.PatNum=adjustment.PatNum 
 				WHERE {wherePatOrFam} ";
-			#endregion
-			#region Pat Payments
-			//Get all payments, except where they should only show inside payplan
-			command+=$@"
+            #endregion
+            #region Pat Payments
+            //Get all payments, except where they should only show inside payplan
+            command += $@"
 				UNION ALL 
 				SELECT (CASE WHEN paysplit.ProcNum > 0 AND paysplit.PayPlanNum > 0 THEN 'PatPay Att. PayPlan' 
 				WHEN paysplit.ProcNum > 0 THEN 'PatPay Att.' 
@@ -265,12 +266,12 @@ namespace OpenDentBusiness {
 				0 AS 'InsCredits' 
 				FROM paysplit 
 				INNER JOIN patient ON patient.PatNum=paysplit.PatNum 
-				WHERE {(payPlanVersion==2 ? "TRUE": "paysplit.PayPlanNum=0")} 
+				WHERE {(payPlanVersion == 2 ? "TRUE" : "paysplit.PayPlanNum=0")} 
 				AND {wherePatOrFam} ";
-			#endregion
-			#region Ins Payments
-			//Get all insurance payments
-			command+=$@"
+            #endregion
+            #region Ins Payments
+            //Get all insurance payments
+            command += $@"
 				UNION ALL 
 				SELECT IF(claimproc.ProcNum > 0,'InsPay-Att.','InsPay') AS 'Type', 
 				claimproc.ClaimProcNum AS 'TranNum', 
@@ -293,10 +294,10 @@ namespace OpenDentBusiness {
 				AND claimproc.PayPlanNum=0 
 				AND claimproc.InsPayAmt!=0 
 				AND {wherePatOrFam} ";
-			#endregion
-			#region WriteOffs
-			//Get all writeoffs, estimated and actual. Only will show estimated when claim is outstanding, otherwise shows actual with payment type of payment.
-			command+=$@"
+            #endregion
+            #region WriteOffs
+            //Get all writeoffs, estimated and actual. Only will show estimated when claim is outstanding, otherwise shows actual with payment type of payment.
+            command += $@"
 				UNION ALL
 				SELECT IF(claimproc.ProcNum > 0,'WriteOff-Att.','WriteOff') AS 'Type', 
 				CONCAT('W',claimproc.ClaimProcNum) AS 'TranNum', 
@@ -322,11 +323,12 @@ namespace OpenDentBusiness {
 				WHERE IF(claimproc.Status IN ({POut.Int((int)ClaimProcStatus.Received)},{POut.Int((int)ClaimProcStatus.Supplemental)}),ABS(claimproc.WriteOff) > 0.005,(ABS(claimproc.WriteOff) > 0.005 OR claimproc.InsPayEst > 0)) 
 				AND claimproc.Status IN({POut.Int((int)ClaimProcStatus.NotReceived)},{POut.Int((int)ClaimProcStatus.Received)},{POut.Int((int)ClaimProcStatus.Supplemental)}) 
 				AND {wherePatOrFam} ";
-			#endregion
-			#region PayPlan Version 1
-			if(payPlanVersion==1) {
-				//get only pay plan credits for pay plan versions 1
-				command+=$@"
+            #endregion
+            #region PayPlan Version 1
+            if (payPlanVersion == 1)
+            {
+                //get only pay plan credits for pay plan versions 1
+                command += $@"
 					UNION ALL 
 					SELECT 'PayPlan Credit' AS 'Type', 
 					payplan.PayPlanNum AS 'TranNum', 
@@ -347,12 +349,13 @@ namespace OpenDentBusiness {
 					INNER JOIN patient ON patient.PatNum=payplan.PatNum 
 					WHERE {wherePatOrFam} 
 					GROUP BY payplan.PayPlanNum ";
-			}
-			#endregion
-			#region PayPlan Version 2
-			else if(payPlanVersion==2) {
-				//get all pay plan credits and debits for pay plan version 2
-				command+=$@"
+            }
+            #endregion
+            #region PayPlan Version 2
+            else if (payPlanVersion == 2)
+            {
+                //get all pay plan credits and debits for pay plan version 2
+                command += $@"
 					UNION ALL
 					SELECT (CASE WHEN payplancharge.ChargeType={POut.Int((int)PayPlanChargeType.Debit)} AND payplancharge.ProcNum > 0 THEN 'PayPlan Charge Att.' 
 					WHEN payplancharge.ChargeType={POut.Int((int)PayPlanChargeType.Debit)} AND payplancharge.ProcNum=0 THEN 'PayPlan Charge' 
@@ -378,12 +381,13 @@ namespace OpenDentBusiness {
 					WHERE payplancharge.ChargeDate <= CURDATE() 
 					AND IF(payplancharge.ChargeType={POut.Int((int)PayPlanChargeType.Debit)},payplan.PlanNum=0,TRUE) 
 					AND {wherePatOrFam} ";
-			}
-			#endregion
-			#region PayPlan Version 3
-			else if(payPlanVersion==3) {
-				//get only pay plan credits for pay plan versions 3
-				command+=$@"
+            }
+            #endregion
+            #region PayPlan Version 3
+            else if (payPlanVersion == 3)
+            {
+                //get only pay plan credits for pay plan versions 3
+                command += $@"
 					UNION ALL
 					SELECT 'PayPlan Credit' AS 'Type', 
 					payplancharge.PayPlanChargeNum AS 'TranNum', 
@@ -403,17 +407,19 @@ namespace OpenDentBusiness {
 					INNER JOIN patient ON patient.PatNum=payplancharge.PatNum 
 					WHERE payplancharge.ChargeType={POut.Int((int)PayPlanChargeType.Credit)} 
 					AND {wherePatOrFam} ";
-			}
-			#endregion
-			else { 
-				//Version 4 will not show payplan information
-			}
-			#region Dynamic Payment Plans (Credits) 
-			if(payPlanVersion==2 || payPlanVersion==3) {//PayPlanVersions.AgeCreditsAndDebits or PayPlanVersions.AgeCreditsOnly
-				//Dynamic payment plan charges will have been picked up by their cooresponding version query above. However, credits for dynamic payment plans
-				//are not made from paymentplancharges when using dynamic payment plans,they are their own table. We need to handle the credits here 
-				//according to what the user wants to see based on their payment plans version. 
-				command+=$@"
+            }
+            #endregion
+            else
+            {
+                //Version 4 will not show payplan information
+            }
+            #region Dynamic Payment Plans (Credits) 
+            if (payPlanVersion == 2 || payPlanVersion == 3)
+            {//PayPlanVersions.AgeCreditsAndDebits or PayPlanVersions.AgeCreditsOnly
+             //Dynamic payment plan charges will have been picked up by their cooresponding version query above. However, credits for dynamic payment plans
+             //are not made from paymentplancharges when using dynamic payment plans,they are their own table. We need to handle the credits here 
+             //according to what the user wants to see based on their payment plans version. 
+                command += $@"
 					UNION ALL
 					SELECT 'Dynamic PayPlan Credit' AS 'Type', 
 					payplan.PayPlanNum AS 'TranNum', 
@@ -487,14 +493,14 @@ namespace OpenDentBusiness {
 							)adjSplit ON adjSplit.AdjNum=adjustment.AdjNum
 					) prodlink ON prodlink.PayPlanLinkNum=payplanlink.PayPlanLinkNum 
 					WHERE (payplan.Guarantor IN ({patNum}) OR payplan.PatNum IN ({patNum})) ";
-				}
-			#endregion
-			//Order the core data
-			command+=@"
+            }
+            #endregion
+            //Order the core data
+            command += @"
 				ORDER BY ProcDate,ProcNum DESC, PatNum, TranDate,
 				FIELD('Type','Proc','Adj-Att.','PatPay Att.','WriteOff-Att.','InsPay-Att.','PayPlan Charge Att.','PatPay Att. PayPlan','Unallocated','PatPay',
 				'WriteOff','Adj','InsPay','PayPlan Credit','Dynamic PayPlan Credit','PayPlan Charge','PatPay PayPlan') ";
-			return command;
-		}
-	}
+            return command;
+        }
+    }
 }

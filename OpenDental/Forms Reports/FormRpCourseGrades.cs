@@ -1,8 +1,3 @@
-using System;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
 //using OpenDental.ReportingOld2;
 
@@ -10,48 +5,53 @@ using System.Windows.Forms;
 //using System.Text;
 //using System.Xml.Serialization;
 
-namespace OpenDental{
-	/// <summary>
-	/// Summary description for FormBasicTemplate.
-	/// </summary>
-	public partial class FormRpCourseGrades : FormODBase {
+namespace OpenDental
+{
+    /// <summary>
+    /// Summary description for FormBasicTemplate.
+    /// </summary>
+    public partial class FormRpCourseGrades : FormODBase
+    {
 
-		///<summary></summary>
-		public FormRpCourseGrades()
-		{
-			//
-			// Required for Windows Form Designer support
-			//
-			InitializeComponent();
-			InitializeLayoutManager();
-			Lan.C("All", new System.Windows.Forms.Control[] {
-				butOK,
-				butCancel,
-			});
-		}
+        ///<summary></summary>
+        public FormRpCourseGrades()
+        {
+            //
+            // Required for Windows Form Designer support
+            //
+            InitializeComponent();
+            InitializeLayoutManager();
+            Lan.C("All", new System.Windows.Forms.Control[] {
+                butOK,
+                butCancel,
+            });
+        }
 
-		private void FormRpCourseGrades_Load(object sender, System.EventArgs e) {
-			/*for(int i=0;i<SchoolClasses.List.Length;i++){
+        private void FormRpCourseGrades_Load(object sender, System.EventArgs e)
+        {
+            /*for(int i=0;i<SchoolClasses.List.Length;i++){
 				comboSchoolClass.Items.Add(SchoolClasses.List[i].GradYear.ToString()+"-"+SchoolClasses.List[i].Descript);
 			}
 			for(int i=0;i<SchoolCourses.List.Length;i++){
 				comboSchoolCourse.Items.Add(SchoolCourses.List[i].CourseID+"  "+SchoolCourses.List[i].Descript);
 			}*/
-			//user will never see the interface
-			ExecuteReport();
-		}
+            //user will never see the interface
+            ExecuteReport();
+        }
 
-		private void butOK_Click(object sender, System.EventArgs e) {
-			//if(comboSchoolClass.SelectedIndex==-1 || comboSchoolCourse.SelectedIndex==-1){
-			//	MsgBox.Show(this,"Please select a class and course.");
-			//	return;
-			//}
-			
-		}
+        private void butOK_Click(object sender, System.EventArgs e)
+        {
+            //if(comboSchoolClass.SelectedIndex==-1 || comboSchoolCourse.SelectedIndex==-1){
+            //	MsgBox.Show(this,"Please select a class and course.");
+            //	return;
+            //}
 
-		private void ExecuteReport(){
-			MessageBox.Show("Incomplete");
-			/*
+        }
+
+        private void ExecuteReport()
+        {
+            MessageBox.Show("Incomplete");
+            /*
 			Report report=new Report();
 			//report.IsLandscape=true;
 			report.AddTitle("Course Grades");
@@ -101,17 +101,18 @@ namespace OpenDental{
 			FormReport FormR=new FormReport(report);
 			//FormR.MyReport=report;
 			FormR.ShowDialog();*/
-			DialogResult=DialogResult.OK;
-		}
+            DialogResult = DialogResult.OK;
+        }
 
-		private void butCancel_Click(object sender, System.EventArgs e) {
-			DialogResult=DialogResult.Cancel;
-		}
+        private void butCancel_Click(object sender, System.EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+        }
 
-		
 
 
-	}
+
+    }
 }
 
 

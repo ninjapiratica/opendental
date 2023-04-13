@@ -1,56 +1,67 @@
 using System.Reflection;
 
-namespace OpenDentBusiness {
-	///<summary></summary>
-	public class UserodApptViews {
-		///<summary>Gets the most recent UserodApptView from the db for the user and clinic.  clinicNum can be 0.  Returns null if no match found.</summary>
-		public static UserodApptView GetOneForUserAndClinic(long userNum,long clinicNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<UserodApptView>(MethodBase.GetCurrentMethod(),userNum,clinicNum);
-			}
-			string command="SELECT * FROM userodapptview "
-				+"WHERE UserNum = "+POut.Long(userNum)+" "
-				+"AND ClinicNum = "+POut.Long(clinicNum)+" ";//If clinicNum of 0 passed in, we MUST filter by 0 because that is a valid entry in the db.
-			return Crud.UserodApptViewCrud.SelectOne(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class UserodApptViews
+    {
+        ///<summary>Gets the most recent UserodApptView from the db for the user and clinic.  clinicNum can be 0.  Returns null if no match found.</summary>
+        public static UserodApptView GetOneForUserAndClinic(long userNum, long clinicNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<UserodApptView>(MethodBase.GetCurrentMethod(), userNum, clinicNum);
+            }
+            string command = "SELECT * FROM userodapptview "
+                + "WHERE UserNum = " + POut.Long(userNum) + " "
+                + "AND ClinicNum = " + POut.Long(clinicNum) + " ";//If clinicNum of 0 passed in, we MUST filter by 0 because that is a valid entry in the db.
+            return Crud.UserodApptViewCrud.SelectOne(command);
+        }
 
-		public static void InsertOrUpdate(long userNum,long clinicNum,long apptViewNum) {
-			//No need to check MiddleTierRole; no call to db.
-			UserodApptView userodApptView=new UserodApptView();
-			userodApptView.UserNum=userNum;
-			userodApptView.ClinicNum=clinicNum;
-			userodApptView.ApptViewNum=apptViewNum;
-			//Check if there is already a row in the database for this user, clinic, and apptview.
-			UserodApptView userodApptViewDb=GetOneForUserAndClinic(userodApptView.UserNum,userodApptView.ClinicNum);
-			if(userodApptViewDb==null) {
-				Insert(userodApptView);
-			}
-			else if(userodApptViewDb.ApptViewNum!=userodApptView.ApptViewNum) {
-				userodApptViewDb.ApptViewNum=userodApptView.ApptViewNum;
-				Update(userodApptViewDb);
-			}
-		}
+        public static void InsertOrUpdate(long userNum, long clinicNum, long apptViewNum)
+        {
+            //No need to check MiddleTierRole; no call to db.
+            UserodApptView userodApptView = new UserodApptView();
+            userodApptView.UserNum = userNum;
+            userodApptView.ClinicNum = clinicNum;
+            userodApptView.ApptViewNum = apptViewNum;
+            //Check if there is already a row in the database for this user, clinic, and apptview.
+            UserodApptView userodApptViewDb = GetOneForUserAndClinic(userodApptView.UserNum, userodApptView.ClinicNum);
+            if (userodApptViewDb == null)
+            {
+                Insert(userodApptView);
+            }
+            else if (userodApptViewDb.ApptViewNum != userodApptView.ApptViewNum)
+            {
+                userodApptViewDb.ApptViewNum = userodApptView.ApptViewNum;
+                Update(userodApptViewDb);
+            }
+        }
 
-		///<summary></summary>
-		public static long Insert(UserodApptView userodApptView) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				userodApptView.UserodApptViewNum=Meth.GetLong(MethodBase.GetCurrentMethod(),userodApptView);
-				return userodApptView.UserodApptViewNum;
-			}
-			return Crud.UserodApptViewCrud.Insert(userodApptView);
-		}
+        ///<summary></summary>
+        public static long Insert(UserodApptView userodApptView)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                userodApptView.UserodApptViewNum = Meth.GetLong(MethodBase.GetCurrentMethod(), userodApptView);
+                return userodApptView.UserodApptViewNum;
+            }
+            return Crud.UserodApptViewCrud.Insert(userodApptView);
+        }
 
-		///<summary></summary>
-		public static void Update(UserodApptView userodApptView) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),userodApptView);
-				return;
-			}
-			Crud.UserodApptViewCrud.Update(userodApptView);
-		}
+        ///<summary></summary>
+        public static void Update(UserodApptView userodApptView)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), userodApptView);
+                return;
+            }
+            Crud.UserodApptViewCrud.Update(userodApptView);
+        }
 
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 
 		private class UserodApptViewCache : CacheListAbs<UserodApptView> {
@@ -128,7 +139,7 @@ namespace OpenDentBusiness {
 
 		#endregion
 		*/
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary>Gets one UserodApptView from the db.</summary>
@@ -158,5 +169,5 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

@@ -1,33 +1,31 @@
-using System;
-using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
-using System.Windows.Forms;
 using OpenDentBusiness;
-using CodeBase;
+using System.Windows.Forms;
 
-namespace OpenDental{
-	/// <summary>
-	/// Summary description for FormBasicTemplate.
-	/// </summary>
-	public partial class FormReqNeededEdit : FormODBase {
-		///<summary></summary>
-		public bool IsNew;
-		public ReqNeeded ReqNeededCur;
+namespace OpenDental
+{
+    /// <summary>
+    /// Summary description for FormBasicTemplate.
+    /// </summary>
+    public partial class FormReqNeededEdit : FormODBase
+    {
+        ///<summary></summary>
+        public bool IsNew;
+        public ReqNeeded ReqNeededCur;
 
-		///<summary></summary>
-		public FormReqNeededEdit()
-		{
-			//
-			// Required for Windows Form Designer support
-			//
-			InitializeComponent();
-			InitializeLayoutManager();
-			Lan.F(this);
-		}
+        ///<summary></summary>
+        public FormReqNeededEdit()
+        {
+            //
+            // Required for Windows Form Designer support
+            //
+            InitializeComponent();
+            InitializeLayoutManager();
+            Lan.F(this);
+        }
 
-		private void FormReqNeededEdit_Load(object sender, System.EventArgs e) {
-			/*for(int i=0;i<SchoolClasses.List.Length;i++) {
+        private void FormReqNeededEdit_Load(object sender, System.EventArgs e)
+        {
+            /*for(int i=0;i<SchoolClasses.List.Length;i++) {
 				comboClass.Items.Add(SchoolClasses.GetDescript(SchoolClasses.List[i]));
 				if(SchoolClasses.List[i].SchoolClassNum==ReqCur.SchoolClassNum){
 					comboClass.SelectedIndex=i;
@@ -39,53 +37,62 @@ namespace OpenDental{
 					comboCourse.SelectedIndex=i;
 				}
 			}*/
-			textDescript.Text=ReqNeededCur.Descript;
-		}
+            textDescript.Text = ReqNeededCur.Descript;
+        }
 
-		private void butDelete_Click(object sender, System.EventArgs e) {
-			if(IsNew){
-				DialogResult=DialogResult.Cancel;
-			}
-			else{
-				string inuseby=ReqStudents.InUseBy(ReqNeededCur.ReqNeededNum);
-				if(inuseby!=""){
-					using MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste(Lan.g(this,"Requirement is already in use by student(s) with grade point(s) attached."
-						+"\r\n"+Lan.g(this,"Delete anyway?  Student grades will not be affected."))
-						+"\r\n"+inuseby);
-					msgBox.ShowDialog();
-					if(msgBox.DialogResult != DialogResult.OK) {
-						return;
-					}
-				}
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete this Requirement?")){
-					return;
-				}
-			}
-			ReqNeededCur=null;
-			DialogResult=DialogResult.OK;
-		}
+        private void butDelete_Click(object sender, System.EventArgs e)
+        {
+            if (IsNew)
+            {
+                DialogResult = DialogResult.Cancel;
+            }
+            else
+            {
+                string inuseby = ReqStudents.InUseBy(ReqNeededCur.ReqNeededNum);
+                if (inuseby != "")
+                {
+                    using MsgBoxCopyPaste msgBox = new MsgBoxCopyPaste(Lan.g(this, "Requirement is already in use by student(s) with grade point(s) attached."
+                        + "\r\n" + Lan.g(this, "Delete anyway?  Student grades will not be affected."))
+                        + "\r\n" + inuseby);
+                    msgBox.ShowDialog();
+                    if (msgBox.DialogResult != DialogResult.OK)
+                    {
+                        return;
+                    }
+                }
+                if (!MsgBox.Show(this, MsgBoxButtons.OKCancel, "Delete this Requirement?"))
+                {
+                    return;
+                }
+            }
+            ReqNeededCur = null;
+            DialogResult = DialogResult.OK;
+        }
 
-		private void butOK_Click(object sender, System.EventArgs e) {
-			if(textDescript.Text==""){
-				MsgBox.Show(this,"Please enter a description first.");
-				return;
-			}
-			ReqNeededCur.Descript=textDescript.Text;
-			//ReqCur.SchoolClassNum=SchoolClasses.List[comboClass.SelectedIndex].SchoolClassNum;
-			//ReqCur.SchoolCourseNum=SchoolCourses.List[comboCourse.SelectedIndex].SchoolCourseNum;
-			DialogResult=DialogResult.OK;
-		}
+        private void butOK_Click(object sender, System.EventArgs e)
+        {
+            if (textDescript.Text == "")
+            {
+                MsgBox.Show(this, "Please enter a description first.");
+                return;
+            }
+            ReqNeededCur.Descript = textDescript.Text;
+            //ReqCur.SchoolClassNum=SchoolClasses.List[comboClass.SelectedIndex].SchoolClassNum;
+            //ReqCur.SchoolCourseNum=SchoolCourses.List[comboCourse.SelectedIndex].SchoolCourseNum;
+            DialogResult = DialogResult.OK;
+        }
 
-		private void butCancel_Click(object sender, System.EventArgs e) {
-			DialogResult=DialogResult.Cancel;
-		}
-
-		
-
-		
+        private void butCancel_Click(object sender, System.EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+        }
 
 
-	}
+
+
+
+
+    }
 }
 
 

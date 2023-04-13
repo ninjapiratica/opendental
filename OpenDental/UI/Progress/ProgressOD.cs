@@ -1,91 +1,96 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using CodeBase;
+﻿using CodeBase;
 using OpenDentBusiness;
+using System;
+using System.Runtime.ExceptionServices;
+using System.Windows.Forms;
 
-namespace OpenDental.UI{
-	//Jordan is the only one allowed to edit this file.
-	//Jordan personally reviews all progress bars that get added.
+namespace OpenDental.UI
+{
+    //Jordan is the only one allowed to edit this file.
+    //Jordan personally reviews all progress bars that get added.
 
-	///<summary>Replacement for ODProgress.  Create an instance, set ActionMain, and ShowDialogProgress.  Shows a progress bar dialog in the main thread, and runs the action in a background thread.  Once the long action has completed, then the progress window will automatically close.  User can Cancel/Abort the thread at any time.  Sample boilerplate is at bottom of this file.</summary>
-	public class ProgressOD{
-		///<summary>This action can include computations, db calls, etc.  It can read from UI elements, but should not write to them because it's on a different thread.</summary>
-		public Action ActionMain=null;
-		///<summary>Indicates that the progress form is in "history" mode which will show a text box with all messages it takes action on and then will stay open, forcing the user to click Close.</summary>
-		public bool HasHistory=false;
-		///<summary>Used with HasHistory and HistoryMsg.  Set to true to close a progress even though it does have history.</summary>
-		public bool HistoryClose=false;
-		///<summary>Used to chain progress windows together with a common history log.  Use with HasHistory and HistoryClose.  Set this to prepopluate the log and also to get the generated log.</summary>
-		public string HistoryMsg="";
-		///<summary>Indicates user clicked cancel. Very common to test this.  Cancel button always shows, so always account for cancel even if you don't explicitly test this.</summary>
-		public bool IsCancelled;
-		///<summary>Very rarely used.  Normally use IsCancelled instead.  True if the action was successful.  False if there was an exception or the user clicked Cancel.  So you would only used this if you also had a try/catch.  This would be used at the end, after the try/catch, and usually after testing for IsCancelled.</summary>
-		public bool IsSuccess;
-		///<summary>Events can be fired from within your action.  Almost always ProgressBar, but others are allowed.</summary>
-		public ODEventType ODEventType=ODEventType.ProgressBar;
-		///<summary>The only two options are Marquee and Blocks.  Continuous is an older option not supported by Window when visual styles are not enabled.</summary>
-		public ProgressBarStyle ProgStyle=ProgressBarStyle.Marquee;
-		///<summary>Always true except in 6 places: db update, PayConnect, EServicesSetup, clock in/out, and FormMessagingButSetup. (Jordan-I don't remember approving phone number synch)  Do not set to false anywhere else.</summary>
-		public bool ShowCancelButton=true;
-		public string StartingMessage="Please Wait...";
-		public string StopNotAllowedMessage="Not allowed to stop because it would corrupt the database.";
-		///<summary>Set this string to show a warning message when the user attempts to cancel. Do necessary translations before setting this. It should follow a format similar to this: "You should not Cancel because ... Cancel anyway?" They will get a yes/no msgbox.</summary>
-		public string MessageCancel;
-		///<summary>If this is set to true, a 3 second sleep will be added to the Action, giving you time to click Cancel during testing.  In case you forget to remove it when you're done, it only works in Debug.  It's totally harmless to leave it in place permanently.</summary>
-		public bool TestSleep;
-		///<summary>The specific type of ODEvent that should be fired / monitored.  Almost always just ProgressBarEvent, but others are allowed.</summary>
-		public Type TypeEvent=typeof(ProgressBarEvent);
+    ///<summary>Replacement for ODProgress.  Create an instance, set ActionMain, and ShowDialogProgress.  Shows a progress bar dialog in the main thread, and runs the action in a background thread.  Once the long action has completed, then the progress window will automatically close.  User can Cancel/Abort the thread at any time.  Sample boilerplate is at bottom of this file.</summary>
+    public class ProgressOD
+    {
+        ///<summary>This action can include computations, db calls, etc.  It can read from UI elements, but should not write to them because it's on a different thread.</summary>
+        public Action ActionMain = null;
+        ///<summary>Indicates that the progress form is in "history" mode which will show a text box with all messages it takes action on and then will stay open, forcing the user to click Close.</summary>
+        public bool HasHistory = false;
+        ///<summary>Used with HasHistory and HistoryMsg.  Set to true to close a progress even though it does have history.</summary>
+        public bool HistoryClose = false;
+        ///<summary>Used to chain progress windows together with a common history log.  Use with HasHistory and HistoryClose.  Set this to prepopluate the log and also to get the generated log.</summary>
+        public string HistoryMsg = "";
+        ///<summary>Indicates user clicked cancel. Very common to test this.  Cancel button always shows, so always account for cancel even if you don't explicitly test this.</summary>
+        public bool IsCancelled;
+        ///<summary>Very rarely used.  Normally use IsCancelled instead.  True if the action was successful.  False if there was an exception or the user clicked Cancel.  So you would only used this if you also had a try/catch.  This would be used at the end, after the try/catch, and usually after testing for IsCancelled.</summary>
+        public bool IsSuccess;
+        ///<summary>Events can be fired from within your action.  Almost always ProgressBar, but others are allowed.</summary>
+        public ODEventType ODEventType = ODEventType.ProgressBar;
+        ///<summary>The only two options are Marquee and Blocks.  Continuous is an older option not supported by Window when visual styles are not enabled.</summary>
+        public ProgressBarStyle ProgStyle = ProgressBarStyle.Marquee;
+        ///<summary>Always true except in 6 places: db update, PayConnect, EServicesSetup, clock in/out, and FormMessagingButSetup. (Jordan-I don't remember approving phone number synch)  Do not set to false anywhere else.</summary>
+        public bool ShowCancelButton = true;
+        public string StartingMessage = "Please Wait...";
+        public string StopNotAllowedMessage = "Not allowed to stop because it would corrupt the database.";
+        ///<summary>Set this string to show a warning message when the user attempts to cancel. Do necessary translations before setting this. It should follow a format similar to this: "You should not Cancel because ... Cancel anyway?" They will get a yes/no msgbox.</summary>
+        public string MessageCancel;
+        ///<summary>If this is set to true, a 3 second sleep will be added to the Action, giving you time to click Cancel during testing.  In case you forget to remove it when you're done, it only works in Debug.  It's totally harmless to leave it in place permanently.</summary>
+        public bool TestSleep;
+        ///<summary>The specific type of ODEvent that should be fired / monitored.  Almost always just ProgressBarEvent, but others are allowed.</summary>
+        public Type TypeEvent = typeof(ProgressBarEvent);
 
-		public ProgressOD(){
-			//no parameters
-		}
+        public ProgressOD()
+        {
+            //no parameters
+        }
 
-		///<summary>This can be surrounded with a try/catch.</summary>
-		public void ShowDialogProgress(){
-			if(ActionMain==null) {
-				return;
-			}
-			using Progress.FormProgressAuto formProgressAuto=new Progress.FormProgressAuto();
-			formProgressAuto.ActionMain=ActionMain;
-			formProgressAuto.HasHistory=HasHistory;
-			formProgressAuto.HistoryClose=HistoryClose;
-			formProgressAuto.HistoryMsg=HistoryMsg;
-			formProgressAuto.ODEventTypeMy=ODEventType;
-			formProgressAuto.ProgStyle=ProgStyle;
-			formProgressAuto.ShowCancelButton=ShowCancelButton;
-			formProgressAuto.StartingMessage=StartingMessage;
-			formProgressAuto.StopNotAllowedMessage=StopNotAllowedMessage;
-			formProgressAuto.MessageCancel=MessageCancel;
-			formProgressAuto.TestSleep=TestSleep;
-			formProgressAuto.TypeEvent=TypeEvent;
-			formProgressAuto.ShowDialog();
-			if(formProgressAuto.DialogResult==DialogResult.OK){
-				IsSuccess=true;
-			}
-			if(formProgressAuto.DialogResult==DialogResult.Cancel){
-				IsCancelled=true;
-			}
-			//third possibility is No, indicating error.  In that case, both of the above will remain false.
-			HistoryMsg=formProgressAuto.HistoryMsg;
-			if(formProgressAuto.ExceptionGenerated!=null){
-				if(formProgressAuto.ExceptionGenerated.InnerException!=null){
-					ExceptionDispatchInfo exceptionDispatchInfo=
-						ExceptionDispatchInfo.Capture(formProgressAuto.ExceptionGenerated.InnerException);//this can happen when methods are invoked by reflection
-					exceptionDispatchInfo.Throw();
-				}
-				ExceptionDispatchInfo exceptionDispatchInfo2=ExceptionDispatchInfo.Capture(formProgressAuto.ExceptionGenerated);
-				exceptionDispatchInfo2.Throw();
-			}
-		}
+        ///<summary>This can be surrounded with a try/catch.</summary>
+        public void ShowDialogProgress()
+        {
+            if (ActionMain == null)
+            {
+                return;
+            }
+            using Progress.FormProgressAuto formProgressAuto = new Progress.FormProgressAuto();
+            formProgressAuto.ActionMain = ActionMain;
+            formProgressAuto.HasHistory = HasHistory;
+            formProgressAuto.HistoryClose = HistoryClose;
+            formProgressAuto.HistoryMsg = HistoryMsg;
+            formProgressAuto.ODEventTypeMy = ODEventType;
+            formProgressAuto.ProgStyle = ProgStyle;
+            formProgressAuto.ShowCancelButton = ShowCancelButton;
+            formProgressAuto.StartingMessage = StartingMessage;
+            formProgressAuto.StopNotAllowedMessage = StopNotAllowedMessage;
+            formProgressAuto.MessageCancel = MessageCancel;
+            formProgressAuto.TestSleep = TestSleep;
+            formProgressAuto.TypeEvent = TypeEvent;
+            formProgressAuto.ShowDialog();
+            if (formProgressAuto.DialogResult == DialogResult.OK)
+            {
+                IsSuccess = true;
+            }
+            if (formProgressAuto.DialogResult == DialogResult.Cancel)
+            {
+                IsCancelled = true;
+            }
+            //third possibility is No, indicating error.  In that case, both of the above will remain false.
+            HistoryMsg = formProgressAuto.HistoryMsg;
+            if (formProgressAuto.ExceptionGenerated != null)
+            {
+                if (formProgressAuto.ExceptionGenerated.InnerException != null)
+                {
+                    ExceptionDispatchInfo exceptionDispatchInfo =
+                        ExceptionDispatchInfo.Capture(formProgressAuto.ExceptionGenerated.InnerException);//this can happen when methods are invoked by reflection
+                    exceptionDispatchInfo.Throw();
+                }
+                ExceptionDispatchInfo exceptionDispatchInfo2 = ExceptionDispatchInfo.Capture(formProgressAuto.ExceptionGenerated);
+                exceptionDispatchInfo2.Throw();
+            }
+        }
 
 
 
-	}
+    }
 }
 
 /*

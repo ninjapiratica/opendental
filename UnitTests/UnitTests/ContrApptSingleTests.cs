@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading;
-using CodeBase;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenDental;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UnitTests.ContrApptSingle_Tests {
-	///<summary>This test was created to test that we don't get an "Object currently in use elsewhere" exception.
-	///GDI+ isn't thread safe, so when two threads try to access the image data an exception is thrown. 
-	///This test creates 20 threads who all try and access the image 500 times each.</summary>
-	[TestClass]
-	public class ContrApptSingleTests:TestBase {
-		/*[TestMethod]
+namespace UnitTests.ContrApptSingle_Tests
+{
+    ///<summary>This test was created to test that we don't get an "Object currently in use elsewhere" exception.
+    ///GDI+ isn't thread safe, so when two threads try to access the image data an exception is thrown. 
+    ///This test creates 20 threads who all try and access the image 500 times each.</summary>
+    [TestClass]
+    public class ContrApptSingleTests : TestBase
+    {
+        /*[TestMethod]
 		public void ContrApptSingle_ShadowGet_Threads() {
 			ContrApptSingle cas=new ContrApptSingle();
 			//Spawn 20 threads to all try and access it.
@@ -112,5 +108,5 @@ namespace UnitTests.ContrApptSingle_Tests {
 			ODThread.RunParallel(listThreads,Timeout.InfiniteTimeSpan,listThreads.Count);
 			Assert.IsFalse(success);//The test should always fail.
 		}*/
-	}
+    }
 }

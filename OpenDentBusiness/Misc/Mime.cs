@@ -1,70 +1,87 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OpenDentBusiness {
-	///<summary>Extract a mime file type from a file/extension. Found this solution here after an exhaustive search. http://stackoverflow.com/a/20011250 .</summary>
-	public class Mime {
-		///<summary>Returns mime type for given file/extension. If no match is found then returns default application/octet-stream.</summary>
-		public static string GetMimeType(string fileName) {
-			if(string.IsNullOrEmpty(fileName)) {
-				throw new Exception("filename must contain a filename");
-			}
-			string extension=System.IO.Path.GetExtension(fileName).ToLower();
-			if(!extension.StartsWith(".")) {
-				extension="." + extension;
-			}
-			string mime;
-			if(_mappings.TryGetValue(extension,out mime)) { //We found it in our list.
-				return mime;
-			}
-			else if(GetWindowsMimeType(extension,out mime)) { //We found it in the registry.
-				return mime;
-			}
-			else { //We didn't find it so default.
-				return "application/octet-stream";
-			}
-		}
+namespace OpenDentBusiness
+{
+    ///<summary>Extract a mime file type from a file/extension. Found this solution here after an exhaustive search. http://stackoverflow.com/a/20011250 .</summary>
+    public class Mime
+    {
+        ///<summary>Returns mime type for given file/extension. If no match is found then returns default application/octet-stream.</summary>
+        public static string GetMimeType(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new Exception("filename must contain a filename");
+            }
+            string extension = System.IO.Path.GetExtension(fileName).ToLower();
+            if (!extension.StartsWith("."))
+            {
+                extension = "." + extension;
+            }
+            string mime;
+            if (_mappings.TryGetValue(extension, out mime))
+            { //We found it in our list.
+                return mime;
+            }
+            else if (GetWindowsMimeType(extension, out mime))
+            { //We found it in the registry.
+                return mime;
+            }
+            else
+            { //We didn't find it so default.
+                return "application/octet-stream";
+            }
+        }
 
-		///<summary>Search registry for a known mime type. Returns false if no match found in registry.</summary>
-		public static bool GetWindowsMimeType(string ext,out string mime) {
-			mime="application/octet-stream";
-			using(Microsoft.Win32.RegistryKey regKey=Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext)) {
-				if(regKey==null) {
-					return false;
-				}
-				object val=regKey.GetValue("Content Type");
-				if(val==null) {
-					return false;
-				}
-				string strval=val.ToString();
-				if(!string.IsNullOrEmpty(strval)) {
-					mime=strval;
-					return true;
-				}
-			}
-			return false;
-		}
+        ///<summary>Search registry for a known mime type. Returns false if no match found in registry.</summary>
+        public static bool GetWindowsMimeType(string ext, out string mime)
+        {
+            mime = "application/octet-stream";
+            using (Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext))
+            {
+                if (regKey == null)
+                {
+                    return false;
+                }
+                object val = regKey.GetValue("Content Type");
+                if (val == null)
+                {
+                    return false;
+                }
+                string strval = val.ToString();
+                if (!string.IsNullOrEmpty(strval))
+                {
+                    mime = strval;
+                    return true;
+                }
+            }
+            return false;
+        }
 
-		///<summary>Returns mime type for given file/extension. If no match is found then returns default text/plain.</summary>
-		public static string GetMimeTypeForEmail(string fileName) {
-			if(string.IsNullOrEmpty(fileName)) {
-				throw new Exception("filename must contain a filename");
-			}
-			string extension=System.IO.Path.GetExtension(fileName).ToLower();
-			if(!extension.StartsWith(".")) {
-				extension="." + extension;
-			}
-			string mime;
-			if(_mappings.TryGetValue(extension,out mime)) { //We found it in our list.
-				return mime;
-			}
-			return "text/plain";
-		}
+        ///<summary>Returns mime type for given file/extension. If no match is found then returns default text/plain.</summary>
+        public static string GetMimeTypeForEmail(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new Exception("filename must contain a filename");
+            }
+            string extension = System.IO.Path.GetExtension(fileName).ToLower();
+            if (!extension.StartsWith("."))
+            {
+                extension = "." + extension;
+            }
+            string mime;
+            if (_mappings.TryGetValue(extension, out mime))
+            { //We found it in our list.
+                return mime;
+            }
+            return "text/plain";
+        }
 
-		///<summary>Known mime types mappings.
-		///Taken from Windows 7 Registry and from C:\Windows\System32\inetsrv\config\applicationHost.config. 
-		///Some added, including .7z and .dat.</summary>
-		private static IDictionary<string,string> _mappings = new Dictionary<string,string>(StringComparer.InvariantCultureIgnoreCase) {
+        ///<summary>Known mime types mappings.
+        ///Taken from Windows 7 Registry and from C:\Windows\System32\inetsrv\config\applicationHost.config. 
+        ///Some added, including .7z and .dat.</summary>
+        private static IDictionary<string, string> _mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
         #region Known list of mime types        
         {".323", "text/h323"},
         {".3g2", "video/3gpp2"},
@@ -627,6 +644,6 @@ namespace OpenDentBusiness {
         {".zip", "application/x-zip-compressed"},
         #endregion
 		};
-	}
+    }
 
 }

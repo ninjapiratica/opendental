@@ -1,161 +1,182 @@
-﻿using System;
+﻿using OpenDentBusiness;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
-using OpenDentBusiness;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 
-namespace OpenDental {
-	public partial class FormEhrGrowthCharts:FormODBase {
-		public long PatNum;
-		private Patient pat;
-		private const float border=50f;
-		private Pen thinPen=new Pen(Color.LightGray,0.5f);
-		private Pen thickPen=new Pen(Color.Black,1.5f);
-		private Brush dataBrush=new SolidBrush(Color.CadetBlue);
-		private float minYH;
-		private float maxYH;
-		private float minYW;
-		private float maxYW;
-		private float minX;
-		private float maxX;
-		private float pixPerYear;
-		private float pixPerInch;
-		private float pixPerPound;
-		private const int minAge=2;
-		private const int maxAge=20;
-		private const int maxInches=76;
-		private const int maxPounds=230;
-		private const int ageRange=maxAge-minAge;
-		List<Vitalsign> listVS;
+namespace OpenDental
+{
+    public partial class FormEhrGrowthCharts : FormODBase
+    {
+        public long PatNum;
+        private Patient pat;
+        private const float border = 50f;
+        private Pen thinPen = new Pen(Color.LightGray, 0.5f);
+        private Pen thickPen = new Pen(Color.Black, 1.5f);
+        private Brush dataBrush = new SolidBrush(Color.CadetBlue);
+        private float minYH;
+        private float maxYH;
+        private float minYW;
+        private float maxYW;
+        private float minX;
+        private float maxX;
+        private float pixPerYear;
+        private float pixPerInch;
+        private float pixPerPound;
+        private const int minAge = 2;
+        private const int maxAge = 20;
+        private const int maxInches = 76;
+        private const int maxPounds = 230;
+        private const int ageRange = maxAge - minAge;
+        List<Vitalsign> listVS;
 
-		public FormEhrGrowthCharts() {
-			InitializeComponent();
-			InitializeLayoutManager();
-		}
+        public FormEhrGrowthCharts()
+        {
+            InitializeComponent();
+            InitializeLayoutManager();
+        }
 
-		private void FormGrowthCharts_Load(object sender,EventArgs e) {
-			listVS = Vitalsigns.Refresh(PatNum);
-			pat=Patients.GetPat(PatNum);
-			Text+=" - "+pat.Gender.ToString()+" Growth Chart for "+pat.FName+" "+pat.LName+" age "+pat.Age;
-			this.Paint-=FormGrowthCharts_Paint;
-			this.PanelClient.Paint+=FormGrowthCharts_Paint;
-		}
+        private void FormGrowthCharts_Load(object sender, EventArgs e)
+        {
+            listVS = Vitalsigns.Refresh(PatNum);
+            pat = Patients.GetPat(PatNum);
+            Text += " - " + pat.Gender.ToString() + " Growth Chart for " + pat.FName + " " + pat.LName + " age " + pat.Age;
+            this.Paint -= FormGrowthCharts_Paint;
+            this.PanelClient.Paint += FormGrowthCharts_Paint;
+        }
 
-		private void FormGrowthCharts_Paint(object sender,PaintEventArgs e) {
-			e.Graphics.SmoothingMode=SmoothingMode.HighQuality;
-			defineBounds(e.Graphics);
-			DrawHeightGrid(e.Graphics);
-			DrawWeightGrid(e.Graphics);
-			PlotHW(e.Graphics);
-		}
+        private void FormGrowthCharts_Paint(object sender, PaintEventArgs e)
+        {
+            e.Graphics.SmoothingMode = SmoothingMode.HighQuality;
+            defineBounds(e.Graphics);
+            DrawHeightGrid(e.Graphics);
+            DrawWeightGrid(e.Graphics);
+            PlotHW(e.Graphics);
+        }
 
-		///<summary>Defines the bounds of the graphs to be drawn based on size of form.</summary>
-		private void defineBounds(Graphics g) {
-			minYH=border;
-			maxYH=ClientSize.Height/2f-border;
-			minYW=ClientSize.Height/2f+border;
-			maxYW=ClientSize.Height-border;
-			minX=border+g.MeasureString("230lbs",Font).Width;
-			maxX=(ClientSize.Width)-border-g.MeasureString("230lbs",Font).Width;
-			pixPerYear=(maxX-minX)/(float)(ageRange);
-			pixPerInch=(maxYH-minYH)/(float)maxInches;
-			pixPerPound=(maxYW-minYW)/(float)maxPounds;
-		}
+        ///<summary>Defines the bounds of the graphs to be drawn based on size of form.</summary>
+        private void defineBounds(Graphics g)
+        {
+            minYH = border;
+            maxYH = ClientSize.Height / 2f - border;
+            minYW = ClientSize.Height / 2f + border;
+            maxYW = ClientSize.Height - border;
+            minX = border + g.MeasureString("230lbs", Font).Width;
+            maxX = (ClientSize.Width) - border - g.MeasureString("230lbs", Font).Width;
+            pixPerYear = (maxX - minX) / (float)(ageRange);
+            pixPerInch = (maxYH - minYH) / (float)maxInches;
+            pixPerPound = (maxYW - minYW) / (float)maxPounds;
+        }
 
-		///<summary></summary>
-		private void DrawHeightGrid(Graphics g) {
-			float curX;
-			float curY;
-			SizeF labelPix;
-			//draw background
-			g.FillRectangle(Brushes.White,minX,minYH,maxX-minX,maxYH-minYH);
-			//draw Title
-			labelPix=g.MeasureString("Height - ("+pat.Gender.ToString()+")",Font);
-			curX=((maxX+minX)/2)-(labelPix.Width/2);
-			curY=minYH-labelPix.Height-2f;
-			g.DrawString("Height - ("+pat.Gender.ToString()+")",Font,Brushes.Black,curX,curY);
-			//Draw thin age lines
-			for(int i=0;i<ageRange+1;i++) {
-				curX=minX+(float)i*pixPerYear;
-				g.DrawLine(thinPen,curX,minYH,curX,maxYH);
-				labelPix=g.MeasureString((i+minAge).ToString()+"y",DefaultFont);
-				g.DrawString((i+minAge).ToString()+"y",Font,Brushes.Black,curX-(labelPix.Width/2f),maxYH+1f);
-			}
-			//draw all Horizontal Height lines
-			for(int i=0;i<maxInches+1;i++) {
-				curY=maxYH-(float)i*pixPerInch;
-				g.DrawLine(thinPen,minX,curY,maxX,curY);
-				if(i%12==0 || i==maxInches) {//bold line and label every 12"
-					g.DrawLine(thickPen,minX,curY,maxX,curY);
-					g.DrawString(i.ToString()+"in",Font,Brushes.Black,border-5f,curY-5f);
-					g.DrawString(i.ToString()+"in",Font,Brushes.Black,maxX+4f,curY-5f);
-				}
-			}
-			//draw bold vertical age lines
-			for(int i=0;i<ageRange+1;i++) {
-				curX=minX+(float)i*pixPerYear;
-				if((i%5)+minAge==5 || i==0) {
-					g.DrawLine(thickPen,curX,minYH,curX,maxYH);
-				}
-			}
-		}
+        ///<summary></summary>
+        private void DrawHeightGrid(Graphics g)
+        {
+            float curX;
+            float curY;
+            SizeF labelPix;
+            //draw background
+            g.FillRectangle(Brushes.White, minX, minYH, maxX - minX, maxYH - minYH);
+            //draw Title
+            labelPix = g.MeasureString("Height - (" + pat.Gender.ToString() + ")", Font);
+            curX = ((maxX + minX) / 2) - (labelPix.Width / 2);
+            curY = minYH - labelPix.Height - 2f;
+            g.DrawString("Height - (" + pat.Gender.ToString() + ")", Font, Brushes.Black, curX, curY);
+            //Draw thin age lines
+            for (int i = 0; i < ageRange + 1; i++)
+            {
+                curX = minX + (float)i * pixPerYear;
+                g.DrawLine(thinPen, curX, minYH, curX, maxYH);
+                labelPix = g.MeasureString((i + minAge).ToString() + "y", DefaultFont);
+                g.DrawString((i + minAge).ToString() + "y", Font, Brushes.Black, curX - (labelPix.Width / 2f), maxYH + 1f);
+            }
+            //draw all Horizontal Height lines
+            for (int i = 0; i < maxInches + 1; i++)
+            {
+                curY = maxYH - (float)i * pixPerInch;
+                g.DrawLine(thinPen, minX, curY, maxX, curY);
+                if (i % 12 == 0 || i == maxInches)
+                {//bold line and label every 12"
+                    g.DrawLine(thickPen, minX, curY, maxX, curY);
+                    g.DrawString(i.ToString() + "in", Font, Brushes.Black, border - 5f, curY - 5f);
+                    g.DrawString(i.ToString() + "in", Font, Brushes.Black, maxX + 4f, curY - 5f);
+                }
+            }
+            //draw bold vertical age lines
+            for (int i = 0; i < ageRange + 1; i++)
+            {
+                curX = minX + (float)i * pixPerYear;
+                if ((i % 5) + minAge == 5 || i == 0)
+                {
+                    g.DrawLine(thickPen, curX, minYH, curX, maxYH);
+                }
+            }
+        }
 
-		///<summary></summary>
-		private void DrawWeightGrid(Graphics g) {
-			float curX;
-			float curY;
-			SizeF labelPix;
-			//draw background
-			g.FillRectangle(Brushes.White,minX,minYW,maxX-minX,maxYW-minYW);
-			//draw Title
-			labelPix=g.MeasureString("Weight - ("+pat.Gender.ToString()+")",Font);
-			curX=((maxX+minX)/2)-(labelPix.Width/2);
-			curY=minYW-labelPix.Height-2f;
-			g.DrawString("Weight - ("+pat.Gender.ToString()+")",Font,Brushes.Black,curX,curY);
-			//Draw thin age lines
-			for(int i=0;i<ageRange+1;i++) {
-				curX=minX+(float)i*pixPerYear;
-				g.DrawLine(thinPen,curX,minYW,curX,maxYW);
-				labelPix=g.MeasureString((i+minAge).ToString()+"y",Font);
-				g.DrawString((i+minAge).ToString()+"y",DefaultFont,Brushes.Black,curX-(labelPix.Width/2f),maxYW+2f);
-			}
-			//draw all Horizontal pound lines
-			for(int i=0;i<maxPounds+1;i++) {
-				curY=maxYW-(float)i*pixPerPound;
-				if(i%5==0){//gray line every 5 lbs
-					g.DrawLine(thinPen,minX,curY,maxX,curY);
-				}
-				if(i%20==0 || i==maxPounds) {//bold line and label every 20lbs
-					g.DrawLine(thickPen,minX,curY,maxX,curY);
-					g.DrawString(i.ToString()+"lbs",DefaultFont,Brushes.Black,border-5f,curY-5f);
-					g.DrawString(i.ToString()+"lbs",DefaultFont,Brushes.Black,maxX+4f,curY-5f);
-				}
-			}
-			//draw bold vertical age lines
-			for(int i=0;i<ageRange+1;i++) {
-				curX=minX+(float)i*pixPerYear;
-				if((i%5)+minAge==5 || i==0) {
-					g.DrawLine(thickPen,curX,minYW,curX,maxYW);
-				}
-			}
-		}
+        ///<summary></summary>
+        private void DrawWeightGrid(Graphics g)
+        {
+            float curX;
+            float curY;
+            SizeF labelPix;
+            //draw background
+            g.FillRectangle(Brushes.White, minX, minYW, maxX - minX, maxYW - minYW);
+            //draw Title
+            labelPix = g.MeasureString("Weight - (" + pat.Gender.ToString() + ")", Font);
+            curX = ((maxX + minX) / 2) - (labelPix.Width / 2);
+            curY = minYW - labelPix.Height - 2f;
+            g.DrawString("Weight - (" + pat.Gender.ToString() + ")", Font, Brushes.Black, curX, curY);
+            //Draw thin age lines
+            for (int i = 0; i < ageRange + 1; i++)
+            {
+                curX = minX + (float)i * pixPerYear;
+                g.DrawLine(thinPen, curX, minYW, curX, maxYW);
+                labelPix = g.MeasureString((i + minAge).ToString() + "y", Font);
+                g.DrawString((i + minAge).ToString() + "y", DefaultFont, Brushes.Black, curX - (labelPix.Width / 2f), maxYW + 2f);
+            }
+            //draw all Horizontal pound lines
+            for (int i = 0; i < maxPounds + 1; i++)
+            {
+                curY = maxYW - (float)i * pixPerPound;
+                if (i % 5 == 0)
+                {//gray line every 5 lbs
+                    g.DrawLine(thinPen, minX, curY, maxX, curY);
+                }
+                if (i % 20 == 0 || i == maxPounds)
+                {//bold line and label every 20lbs
+                    g.DrawLine(thickPen, minX, curY, maxX, curY);
+                    g.DrawString(i.ToString() + "lbs", DefaultFont, Brushes.Black, border - 5f, curY - 5f);
+                    g.DrawString(i.ToString() + "lbs", DefaultFont, Brushes.Black, maxX + 4f, curY - 5f);
+                }
+            }
+            //draw bold vertical age lines
+            for (int i = 0; i < ageRange + 1; i++)
+            {
+                curX = minX + (float)i * pixPerYear;
+                if ((i % 5) + minAge == 5 || i == 0)
+                {
+                    g.DrawLine(thickPen, curX, minYW, curX, maxYW);
+                }
+            }
+        }
 
-		///<summary></summary>
-		private void PlotHW(Graphics g) {
-			float curX;
-			float curY;
-			foreach(Vitalsign vs in listVS) {
-				TimeSpan ageOfVitals = vs.DateTaken-pat.Birthdate;
-				curX=minX+(float)((ageOfVitals.TotalDays/365)-2)*pixPerYear;//-2 to adjust for age starting at 2yrs old
-				curY=maxYH-vs.Height*pixPerInch;
-				g.FillEllipse(Brushes.Blue,curX-2.5f,curY-2.5f,5f,5f);
-				curY=maxYW-(float)vs.Weight*pixPerPound;
-				g.FillEllipse(Brushes.Teal,curX-2.5f,curY-2.5f,5f,5f);
-			}
-		}
-	
-	}
+        ///<summary></summary>
+        private void PlotHW(Graphics g)
+        {
+            float curX;
+            float curY;
+            foreach (Vitalsign vs in listVS)
+            {
+                TimeSpan ageOfVitals = vs.DateTaken - pat.Birthdate;
+                curX = minX + (float)((ageOfVitals.TotalDays / 365) - 2) * pixPerYear;//-2 to adjust for age starting at 2yrs old
+                curY = maxYH - vs.Height * pixPerInch;
+                g.FillEllipse(Brushes.Blue, curX - 2.5f, curY - 2.5f, 5f, 5f);
+                curY = maxYW - (float)vs.Weight * pixPerPound;
+                g.FillEllipse(Brushes.Teal, curX - 2.5f, curY - 2.5f, 5f, 5f);
+            }
+        }
+
+    }
 }
 
 

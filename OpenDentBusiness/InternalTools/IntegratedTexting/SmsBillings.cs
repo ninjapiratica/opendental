@@ -1,41 +1,47 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Text;
 using System.Linq;
+using System.Reflection;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class SmsBillings{
-		/// <summary>dateFrom is inclusive. dateTo is exclusive. Used by OD Broadcaster. DO NOT REMOVE!!!</summary>
-		public static List<SmsBilling> GetByDateRange(DateTime dateFrom,DateTime dateTo) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<SmsBilling>>(MethodBase.GetCurrentMethod(),dateFrom,dateTo);
-			}
-			string command="SELECT * FROM smsbilling WHERE DateUsage >= "+POut.Date(dateFrom,true)+" AND DateUsage < "+POut.Date(dateTo,true);
-			return Crud.SmsBillingCrud.SelectMany(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class SmsBillings
+    {
+        /// <summary>dateFrom is inclusive. dateTo is exclusive. Used by OD Broadcaster. DO NOT REMOVE!!!</summary>
+        public static List<SmsBilling> GetByDateRange(DateTime dateFrom, DateTime dateTo)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<SmsBilling>>(MethodBase.GetCurrentMethod(), dateFrom, dateTo);
+            }
+            string command = "SELECT * FROM smsbilling WHERE DateUsage >= " + POut.Date(dateFrom, true) + " AND DateUsage < " + POut.Date(dateTo, true);
+            return Crud.SmsBillingCrud.SelectMany(command);
+        }
 
-		/// <summary>HQ only. Broadcast Monitor. DO NOT REMOVE!!!</summary>
-		public static List<SmsBilling> GetAll() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<SmsBilling>>(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT * FROM smsbilling";
-			return Crud.SmsBillingCrud.SelectMany(command);
-		}
+        /// <summary>HQ only. Broadcast Monitor. DO NOT REMOVE!!!</summary>
+        public static List<SmsBilling> GetAll()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<SmsBilling>>(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT * FROM smsbilling";
+            return Crud.SmsBillingCrud.SelectMany(command);
+        }
 
-		///<summary></summary>
-		public static long Insert(SmsBilling smsBilling) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				smsBilling.SmsBillingNum=Meth.GetLong(MethodBase.GetCurrentMethod(),smsBilling);
-				return smsBilling.SmsBillingNum;
-			}
-			return Crud.SmsBillingCrud.Insert(smsBilling);
-		}
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+        ///<summary></summary>
+        public static long Insert(SmsBilling smsBilling)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                smsBilling.SmsBillingNum = Meth.GetLong(MethodBase.GetCurrentMethod(), smsBilling);
+                return smsBilling.SmsBillingNum;
+            }
+            return Crud.SmsBillingCrud.Insert(smsBilling);
+        }
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 		//This region can be eliminated if this is not a table type with cached data.
 		//If leaving this region in place, be sure to add RefreshCache and FillCache 
@@ -74,7 +80,7 @@ namespace OpenDentBusiness{
 		}
 		#endregion
 		*/
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -114,16 +120,18 @@ namespace OpenDentBusiness{
 		}
 		*/
 
-		///<summary>Can return null. Date usage should be the first of the month, if not will return the SmsBilling for the given patnum where month and year match dateUsage.</summary>
-		public static SmsBilling getForPatNum(long patNum,DateTime dateUsage) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<SmsBilling>(MethodBase.GetCurrentMethod(),patNum,dateUsage);
-			}
-			string command="SELECT * FROM smsbilling WHERE PatNum = "+POut.Long(patNum);
-			List<SmsBilling> listSmsBillingAll=Crud.SmsBillingCrud.SelectMany(command);
-			return listSmsBillingAll.First(x => x.DateUsage.Year==dateUsage.Year && x.DateUsage.Month==dateUsage.Month);
-		}
+        ///<summary>Can return null. Date usage should be the first of the month, if not will return the SmsBilling for the given patnum where month and year match dateUsage.</summary>
+        public static SmsBilling getForPatNum(long patNum, DateTime dateUsage)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<SmsBilling>(MethodBase.GetCurrentMethod(), patNum, dateUsage);
+            }
+            string command = "SELECT * FROM smsbilling WHERE PatNum = " + POut.Long(patNum);
+            List<SmsBilling> listSmsBillingAll = Crud.SmsBillingCrud.SelectMany(command);
+            return listSmsBillingAll.First(x => x.DateUsage.Year == dateUsage.Year && x.DateUsage.Month == dateUsage.Month);
+        }
 
 
-	}
+    }
 }

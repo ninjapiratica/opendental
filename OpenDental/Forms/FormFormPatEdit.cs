@@ -1,41 +1,39 @@
-using System;
-using System.Drawing;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Windows.Forms;
 using OpenDental.UI;
-using OpenDental.ReportingComplex;
 using OpenDentBusiness;
+using System;
+using System.Windows.Forms;
 
-namespace OpenDental{
-	/// <summary>
-	/// This form is Deprecated.
-	/// </summary>
-	public partial class FormFormPatEdit : FormODBase {
-		//private Question[] QuestionList;
-		private QuestionDef[] _questionDefArray;
-		//private ContrMultInput multInput;
-		public FormPat FormPatCur;
-		//public bool IsNew;
+namespace OpenDental
+{
+    /// <summary>
+    /// This form is Deprecated.
+    /// </summary>
+    public partial class FormFormPatEdit : FormODBase
+    {
+        //private Question[] QuestionList;
+        private QuestionDef[] _questionDefArray;
+        //private ContrMultInput multInput;
+        public FormPat FormPatCur;
+        //public bool IsNew;
 
-		///<summary></summary>
-		public FormFormPatEdit()
-		{
-			//
-			// Required for Windows Form Designer support
-			//
-			InitializeComponent();
-			InitializeLayoutManager();
-			Lan.F(this);
-			//PatNum=patNum;
-			//FormPatCur=formPatCur.Clone();
-			//multInput.IsQuestionnaire=true;
-		}
-		
-		private void FormFormPatEdit_Load(object sender,EventArgs e) {
-			_questionDefArray=QuestionDefs.Refresh();
-			/*if(IsNew){
+        ///<summary></summary>
+        public FormFormPatEdit()
+        {
+            //
+            // Required for Windows Form Designer support
+            //
+            InitializeComponent();
+            InitializeLayoutManager();
+            Lan.F(this);
+            //PatNum=patNum;
+            //FormPatCur=formPatCur.Clone();
+            //multInput.IsQuestionnaire=true;
+        }
+
+        private void FormFormPatEdit_Load(object sender, EventArgs e)
+        {
+            _questionDefArray = QuestionDefs.Refresh();
+            /*if(IsNew){
 				gridMain.Visible=false;
 				butDelete.Visible=false;
 				//only gets filled once on startup, and not saved until OK.
@@ -49,13 +47,13 @@ namespace OpenDental{
 				}
 			}
 			else {*/
-			butOK.Visible=false;
-			butCancel.Text=Lan.g(this,"Close");
-			//multInput.Visible=false;
-			//Gets filled repeatedly.  Saved each time user double clicks on a row.  Only the answer can be edited.
-			FillGrid();
-			//}
-			/*QuestionDefList=QuestionDefs.Refresh();
+            butOK.Visible = false;
+            butCancel.Text = Lan.g(this, "Close");
+            //multInput.Visible=false;
+            //Gets filled repeatedly.  Saved each time user double clicks on a row.  Only the answer can be edited.
+            FillGrid();
+            //}
+            /*QuestionDefList=QuestionDefs.Refresh();
 			QuestionList=Questions.Refresh(PatNum);
 			if(QuestionList.Length==0){
 				IsNew=true;
@@ -79,63 +77,72 @@ namespace OpenDental{
 				//Gets filled repeatedly.  Saved each time user double clicks on a row.  Only the answer can be edited.
 				FillGrid();
 			}*/
-		}
+        }
 
-		private void FormFormPatEdit_Shown(object sender,EventArgs e) {
-			//if(IsNew){
-			//	if(QuestionDefList.Length==0){
-			//		MsgBox.Show(this,"Go to Setup | Obsolete | Questionnaire to setup questions for all patients.");
-			//	}
-			//}
-		}
+        private void FormFormPatEdit_Shown(object sender, EventArgs e)
+        {
+            //if(IsNew){
+            //	if(QuestionDefList.Length==0){
+            //		MsgBox.Show(this,"Go to Setup | Obsolete | Questionnaire to setup questions for all patients.");
+            //	}
+            //}
+        }
 
-		private void FillGrid(){
-			//QuestionList=Questions.Refresh(PatNum);
-			gridMain.BeginUpdate();
-			gridMain.Columns.Clear();
-			GridColumn col=new GridColumn(Lan.g("TableQuestions","Question"),370);
-			gridMain.Columns.Add(col);
-			col=new GridColumn(Lan.g("TableQuestions","Answer"),370);
-			gridMain.Columns.Add(col);
-			gridMain.ListGridRows.Clear();
-			GridRow row;
-			for(int i=0;i<FormPatCur.QuestionList.Count;i++){
-				row=new GridRow();
-				row.Cells.Add(FormPatCur.QuestionList[i].Description);
-				row.Cells.Add(FormPatCur.QuestionList[i].Answer);
-				gridMain.ListGridRows.Add(row);
-			}
-			gridMain.EndUpdate();
-		}
+        private void FillGrid()
+        {
+            //QuestionList=Questions.Refresh(PatNum);
+            gridMain.BeginUpdate();
+            gridMain.Columns.Clear();
+            GridColumn col = new GridColumn(Lan.g("TableQuestions", "Question"), 370);
+            gridMain.Columns.Add(col);
+            col = new GridColumn(Lan.g("TableQuestions", "Answer"), 370);
+            gridMain.Columns.Add(col);
+            gridMain.ListGridRows.Clear();
+            GridRow row;
+            for (int i = 0; i < FormPatCur.QuestionList.Count; i++)
+            {
+                row = new GridRow();
+                row.Cells.Add(FormPatCur.QuestionList[i].Description);
+                row.Cells.Add(FormPatCur.QuestionList[i].Answer);
+                gridMain.ListGridRows.Add(row);
+            }
+            gridMain.EndUpdate();
+        }
 
-		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			//only visible if editing existing quesionnaire.
-			using InputBox inputBox=new InputBox(FormPatCur.QuestionList[e.Row].Description);
-			inputBox.textResult.Text=FormPatCur.QuestionList[e.Row].Answer;
-			inputBox.ShowDialog();
-			if(inputBox.DialogResult==DialogResult.OK){
-				FormPatCur.QuestionList[e.Row].Answer=inputBox.textResult.Text;
-				Questions.Update(FormPatCur.QuestionList[e.Row]);
-			}
-			FillGrid();
-		}
+        private void gridMain_CellDoubleClick(object sender, ODGridClickEventArgs e)
+        {
+            //only visible if editing existing quesionnaire.
+            using InputBox inputBox = new InputBox(FormPatCur.QuestionList[e.Row].Description);
+            inputBox.textResult.Text = FormPatCur.QuestionList[e.Row].Answer;
+            inputBox.ShowDialog();
+            if (inputBox.DialogResult == DialogResult.OK)
+            {
+                FormPatCur.QuestionList[e.Row].Answer = inputBox.textResult.Text;
+                Questions.Update(FormPatCur.QuestionList[e.Row]);
+            }
+            FillGrid();
+        }
 
-		private void butDelete_Click(object sender,EventArgs e) {
-			//only visible if editing existing quesionnaire.
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete this questionnaire?")){
-				return;
-			}
-			FormPats.Delete(FormPatCur.FormPatNum);
-			DialogResult=DialogResult.OK;
-		}
+        private void butDelete_Click(object sender, EventArgs e)
+        {
+            //only visible if editing existing quesionnaire.
+            if (!MsgBox.Show(this, MsgBoxButtons.OKCancel, "Delete this questionnaire?"))
+            {
+                return;
+            }
+            FormPats.Delete(FormPatCur.FormPatNum);
+            DialogResult = DialogResult.OK;
+        }
 
-		private void butOK_Click(object sender, System.EventArgs e) {
-			if(_questionDefArray.Length==0){
-				MsgBox.Show(this,"No questions to save.");
-				return;
-			}
-			//only visible if IsNew
-			/*
+        private void butOK_Click(object sender, System.EventArgs e)
+        {
+            if (_questionDefArray.Length == 0)
+            {
+                MsgBox.Show(this, "No questions to save.");
+                return;
+            }
+            //only visible if IsNew
+            /*
 			FormPats.Insert(FormPatCur);
 			Question quest;
 			ArrayList ALval;
@@ -157,23 +164,24 @@ namespace OpenDental{
 				quest.FormPatNum=FormPatCur.FormPatNum;
 				Questions.Insert(quest);
 			}*/
-			DialogResult=DialogResult.OK;
-		}
+            DialogResult = DialogResult.OK;
+        }
 
-		private void butCancel_Click(object sender, System.EventArgs e) {
-			Close();
-		}
-
-		
-
-		
-
-	
-
-		
+        private void butCancel_Click(object sender, System.EventArgs e)
+        {
+            Close();
+        }
 
 
-	}
+
+
+
+
+
+
+
+
+    }
 }
 
 

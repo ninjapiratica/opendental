@@ -1,31 +1,33 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class LoginAttempts{
-		///<summary>Returns the login attempts for the given user in the last X minutes.</summary>
-		public static int CountForUser(string userName,UserWebFKeyType type,int lastXMinutes) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<int>(MethodBase.GetCurrentMethod(),userName,type,lastXMinutes);
-			}
-			string command=$@"SELECT COUNT(*) FROM loginattempt WHERE UserName='{POut.String(userName)}' AND LoginType={POut.Int((int)type)}
-				AND DateTFail >= {DbHelper.DateAddMinute("NOW()",POut.Int(-lastXMinutes))}";
-			return PIn.Int(Db.GetCount(command));
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class LoginAttempts
+    {
+        ///<summary>Returns the login attempts for the given user in the last X minutes.</summary>
+        public static int CountForUser(string userName, UserWebFKeyType type, int lastXMinutes)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<int>(MethodBase.GetCurrentMethod(), userName, type, lastXMinutes);
+            }
+            string command = $@"SELECT COUNT(*) FROM loginattempt WHERE UserName='{POut.String(userName)}' AND LoginType={POut.Int((int)type)}
+				AND DateTFail >= {DbHelper.DateAddMinute("NOW()", POut.Int(-lastXMinutes))}";
+            return PIn.Int(Db.GetCount(command));
+        }
 
-		///<summary></summary>
-		public static long InsertFailed(string userName,UserWebFKeyType type) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetLong(MethodBase.GetCurrentMethod(),userName,type);
-			}
-			return Crud.LoginAttemptCrud.Insert(new LoginAttempt { UserName=userName,LoginType=type });
-		}
+        ///<summary></summary>
+        public static long InsertFailed(string userName, UserWebFKeyType type)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetLong(MethodBase.GetCurrentMethod(), userName, type);
+            }
+            return Crud.LoginAttemptCrud.Insert(new LoginAttempt { UserName = userName, LoginType = type });
+        }
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 		#region Get Methods
 		///<summary></summary>
@@ -75,5 +77,5 @@ namespace OpenDentBusiness{
 		
 		#endregion Misc Methods
 		*/
-	}
+    }
 }

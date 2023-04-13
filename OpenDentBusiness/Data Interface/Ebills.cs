@@ -2,66 +2,79 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class Ebills{
-		#region CachePattern
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class Ebills
+    {
+        #region CachePattern
 
-		private class EbillCache : CacheListAbs<Ebill> {
-			protected override List<Ebill> GetCacheFromDb() {
-				string command="SELECT * FROM ebill";
-				return Crud.EbillCrud.SelectMany(command);
-			}
-			protected override List<Ebill> TableToList(DataTable table) {
-				return Crud.EbillCrud.TableToList(table);
-			}
-			protected override Ebill Copy(Ebill Ebill) {
-				return Ebill.Copy();
-			}
-			protected override DataTable ListToTable(List<Ebill> listEbills) {
-				return Crud.EbillCrud.ListToTable(listEbills,"Ebill");
-			}
-			protected override void FillCacheIfNeeded() {
-				Ebills.GetTableFromCache(false);
-			}
-		}
-		
-		///<summary>The object that accesses the cache in a thread-safe manner.</summary>
-		private static EbillCache _EbillCache=new EbillCache();
+        private class EbillCache : CacheListAbs<Ebill>
+        {
+            protected override List<Ebill> GetCacheFromDb()
+            {
+                string command = "SELECT * FROM ebill";
+                return Crud.EbillCrud.SelectMany(command);
+            }
+            protected override List<Ebill> TableToList(DataTable table)
+            {
+                return Crud.EbillCrud.TableToList(table);
+            }
+            protected override Ebill Copy(Ebill Ebill)
+            {
+                return Ebill.Copy();
+            }
+            protected override DataTable ListToTable(List<Ebill> listEbills)
+            {
+                return Crud.EbillCrud.ListToTable(listEbills, "Ebill");
+            }
+            protected override void FillCacheIfNeeded()
+            {
+                Ebills.GetTableFromCache(false);
+            }
+        }
 
-		public static List<Ebill> GetDeepCopy(bool isShort=false) {
-			return _EbillCache.GetDeepCopy(isShort);
-		}
+        ///<summary>The object that accesses the cache in a thread-safe manner.</summary>
+        private static EbillCache _EbillCache = new EbillCache();
 
-		public static Ebill GetFirstOrDefault(Func<Ebill,bool> match,bool isShort=false) {
-			return _EbillCache.GetFirstOrDefault(match,isShort);
-		}
+        public static List<Ebill> GetDeepCopy(bool isShort = false)
+        {
+            return _EbillCache.GetDeepCopy(isShort);
+        }
 
-		///<summary>Refreshes the cache and returns it as a DataTable. This will refresh the ClientWeb's cache and the ServerWeb's cache.</summary>
-		public static DataTable RefreshCache() {
-			return GetTableFromCache(true);
-		}
+        public static Ebill GetFirstOrDefault(Func<Ebill, bool> match, bool isShort = false)
+        {
+            return _EbillCache.GetFirstOrDefault(match, isShort);
+        }
 
-		///<summary>Fills the local cache with the passed in DataTable.</summary>
-		public static void FillCacheFromTable(DataTable table) {
-			_EbillCache.FillCacheFromTable(table);
-		}
+        ///<summary>Refreshes the cache and returns it as a DataTable. This will refresh the ClientWeb's cache and the ServerWeb's cache.</summary>
+        public static DataTable RefreshCache()
+        {
+            return GetTableFromCache(true);
+        }
 
-		///<summary>Always refreshes the ClientWeb's cache.</summary>
-		public static DataTable GetTableFromCache(bool doRefreshCache) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				DataTable table=Meth.GetTable(MethodBase.GetCurrentMethod(),doRefreshCache);
-				_EbillCache.FillCacheFromTable(table);
-				return table;
-			}
-			return _EbillCache.GetTableFromCache(doRefreshCache);
-		}
+        ///<summary>Fills the local cache with the passed in DataTable.</summary>
+        public static void FillCacheFromTable(DataTable table)
+        {
+            _EbillCache.FillCacheFromTable(table);
+        }
 
-		#endregion
+        ///<summary>Always refreshes the ClientWeb's cache.</summary>
+        public static DataTable GetTableFromCache(bool doRefreshCache)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                DataTable table = Meth.GetTable(MethodBase.GetCurrentMethod(), doRefreshCache);
+                _EbillCache.FillCacheFromTable(table);
+                return table;
+            }
+            return _EbillCache.GetTableFromCache(doRefreshCache);
+        }
 
-		/*
+        #endregion
+
+        /*
 		 
 		///<summary></summary>
 		public static List<Ebill> GetForPat(long patNum){
@@ -109,17 +122,20 @@ namespace OpenDentBusiness{
 		 
 		*/
 
-		///<summary>To get the defaults, use clinicNum=0.</summary>
-		public static Ebill GetForClinic(long clinicNum) {
-			//No need to check MiddleTierRole; no call to db.
-			return GetFirstOrDefault(x => x.ClinicNum==clinicNum);
-		}
+        ///<summary>To get the defaults, use clinicNum=0.</summary>
+        public static Ebill GetForClinic(long clinicNum)
+        {
+            //No need to check MiddleTierRole; no call to db.
+            return GetFirstOrDefault(x => x.ClinicNum == clinicNum);
+        }
 
-		public static bool Sync(List<Ebill> listNew,List<Ebill> listOld) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,listOld);
-			}
-			return Crud.EbillCrud.Sync(listNew,listOld);
-		}
-	}
+        public static bool Sync(List<Ebill> listNew, List<Ebill> listOld)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetBool(MethodBase.GetCurrentMethod(), listNew, listOld);
+            }
+            return Crud.EbillCrud.Sync(listNew, listOld);
+        }
+    }
 }

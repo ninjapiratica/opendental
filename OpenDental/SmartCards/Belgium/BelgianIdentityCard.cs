@@ -1,13 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
 using OpenDentBusiness;
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
 
-namespace OpenDental.SmartCards.Belgium {
-    public class BelgianIdentityCard : SmartCardService {
+namespace OpenDental.SmartCards.Belgium
+{
+    public class BelgianIdentityCard : SmartCardService
+    {
         public BelgianIdentityCard(ISmartCardManager manager)
-            : base(manager) {
+            : base(manager)
+        {
             SupportedAtrs.Add(new byte[] { 0x3B, 0x98, 0x94, 0x40, 0x0A, 0xA5, 0x03, 0x01, 0x01, 0x01, 0xAD, 0x13, 0x10 });
             SupportedAtrs.Add(new byte[] { 0x3B, 0x98, 0x13, 0x40, 0x0A, 0xA5, 0x03, 0x01, 0x01, 0x01, 0xAD, 0x13, 0x11 });
         }
@@ -76,7 +78,8 @@ namespace OpenDental.SmartCards.Belgium {
 
         #endregion
 
-        public override Patient GetPatientInfo(string reader) {
+        public override Patient GetPatientInfo(string reader)
+        {
             //
             // Define handle
             //
@@ -99,18 +102,21 @@ namespace OpenDental.SmartCards.Belgium {
 
             // Populate first name field.
             patient.FName = string.Empty;
-            if (!string.IsNullOrEmpty(firstName1)) {
+            if (!string.IsNullOrEmpty(firstName1))
+            {
                 if (patient.FName.Length > 0)
                     patient.FName += " ";
                 patient.FName += firstName1;
             }
-            if (!string.IsNullOrEmpty(firstName2)) {
+            if (!string.IsNullOrEmpty(firstName2))
+            {
                 if (patient.FName.Length > 0)
                     patient.FName += " ";
                 patient.FName += firstName2;
             }
 
-            if (!string.IsNullOrEmpty(firstName3)) {
+            if (!string.IsNullOrEmpty(firstName3))
+            {
                 if (patient.FName.Length > 0)
                     patient.FName += " ";
                 patient.FName += firstName3;
@@ -124,7 +130,8 @@ namespace OpenDental.SmartCards.Belgium {
             return patient;
         }
 
-        private string GetString(byte[] bytes) {
+        private string GetString(byte[] bytes)
+        {
             if (bytes == null)
                 return null;
 
@@ -134,8 +141,10 @@ namespace OpenDental.SmartCards.Belgium {
             int length = bytes.Length;
             int count = 0;
 
-            for (int i = 0; i < length; i++) {
-                if (bytes[i] == '\0') {
+            for (int i = 0; i < length; i++)
+            {
+                if (bytes[i] == '\0')
+                {
                     count = i;
                     break;
                 }

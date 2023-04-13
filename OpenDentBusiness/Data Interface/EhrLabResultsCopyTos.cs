@@ -1,41 +1,46 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class EhrLabResultsCopyTos {
-		///<summary></summary>
-		public static List<EhrLabResultsCopyTo> GetForLab(long ehrLabNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<EhrLabResultsCopyTo>>(MethodBase.GetCurrentMethod(),ehrLabNum);
-			}
-			string command="SELECT * FROM ehrlabresultscopyto WHERE EhrLabNum = "+POut.Long(ehrLabNum);
-			return Crud.EhrLabResultsCopyToCrud.SelectMany(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class EhrLabResultsCopyTos
+    {
+        ///<summary></summary>
+        public static List<EhrLabResultsCopyTo> GetForLab(long ehrLabNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<EhrLabResultsCopyTo>>(MethodBase.GetCurrentMethod(), ehrLabNum);
+            }
+            string command = "SELECT * FROM ehrlabresultscopyto WHERE EhrLabNum = " + POut.Long(ehrLabNum);
+            return Crud.EhrLabResultsCopyToCrud.SelectMany(command);
+        }
 
-		///<summary>Deletes notes for lab results too.</summary>
-		public static void DeleteForLab(long ehrLabNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),ehrLabNum);
-				return;
-			}
-			string command="DELETE FROM ehrlabresultscopyto WHERE EhrLabNum = "+POut.Long(ehrLabNum);
-			Db.NonQ(command);
-		}
+        ///<summary>Deletes notes for lab results too.</summary>
+        public static void DeleteForLab(long ehrLabNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), ehrLabNum);
+                return;
+            }
+            string command = "DELETE FROM ehrlabresultscopyto WHERE EhrLabNum = " + POut.Long(ehrLabNum);
+            Db.NonQ(command);
+        }
 
-		///<summary></summary>
-		public static long Insert(EhrLabResultsCopyTo ehrLabResultsCopyTo) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				ehrLabResultsCopyTo.EhrLabResultsCopyToNum=Meth.GetLong(MethodBase.GetCurrentMethod(),ehrLabResultsCopyTo);
-				return ehrLabResultsCopyTo.EhrLabResultsCopyToNum;
-			}
-			return Crud.EhrLabResultsCopyToCrud.Insert(ehrLabResultsCopyTo);
-		}
+        ///<summary></summary>
+        public static long Insert(EhrLabResultsCopyTo ehrLabResultsCopyTo)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                ehrLabResultsCopyTo.EhrLabResultsCopyToNum = Meth.GetLong(MethodBase.GetCurrentMethod(), ehrLabResultsCopyTo);
+                return ehrLabResultsCopyTo.EhrLabResultsCopyToNum;
+            }
+            return Crud.EhrLabResultsCopyToCrud.Insert(ehrLabResultsCopyTo);
+        }
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -74,5 +79,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

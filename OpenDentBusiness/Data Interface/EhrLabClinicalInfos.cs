@@ -1,42 +1,47 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class EhrLabClinicalInfos {
-		///<summary></summary>
-		public static List<EhrLabClinicalInfo> GetForLab(long ehrLabNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<EhrLabClinicalInfo>>(MethodBase.GetCurrentMethod(),ehrLabNum);
-			}
-			string command="SELECT * FROM ehrlabclinicalinfo WHERE EhrLabNum = "+POut.Long(ehrLabNum);
-			return Crud.EhrLabClinicalInfoCrud.SelectMany(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class EhrLabClinicalInfos
+    {
+        ///<summary></summary>
+        public static List<EhrLabClinicalInfo> GetForLab(long ehrLabNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<EhrLabClinicalInfo>>(MethodBase.GetCurrentMethod(), ehrLabNum);
+            }
+            string command = "SELECT * FROM ehrlabclinicalinfo WHERE EhrLabNum = " + POut.Long(ehrLabNum);
+            return Crud.EhrLabClinicalInfoCrud.SelectMany(command);
+        }
 
-		///<summary>Deletes notes for lab results too.</summary>
-		public static void DeleteForLab(long ehrLabNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),ehrLabNum);
-				return;
-			}
-			string command="DELETE FROM ehrlabclinicalinfo WHERE EhrLabNum = "+POut.Long(ehrLabNum);
-			Db.NonQ(command);
-		}
+        ///<summary>Deletes notes for lab results too.</summary>
+        public static void DeleteForLab(long ehrLabNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), ehrLabNum);
+                return;
+            }
+            string command = "DELETE FROM ehrlabclinicalinfo WHERE EhrLabNum = " + POut.Long(ehrLabNum);
+            Db.NonQ(command);
+        }
 
-		///<summary></summary>
-		public static long Insert(EhrLabClinicalInfo ehrLabClinicalInfo) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				ehrLabClinicalInfo.EhrLabClinicalInfoNum=Meth.GetLong(MethodBase.GetCurrentMethod(),ehrLabClinicalInfo);
-				return ehrLabClinicalInfo.EhrLabClinicalInfoNum;
-			}
-			return Crud.EhrLabClinicalInfoCrud.Insert(ehrLabClinicalInfo);
-		}
+        ///<summary></summary>
+        public static long Insert(EhrLabClinicalInfo ehrLabClinicalInfo)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                ehrLabClinicalInfo.EhrLabClinicalInfoNum = Meth.GetLong(MethodBase.GetCurrentMethod(), ehrLabClinicalInfo);
+                return ehrLabClinicalInfo.EhrLabClinicalInfoNum;
+            }
+            return Crud.EhrLabClinicalInfoCrud.Insert(ehrLabClinicalInfo);
+        }
 
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 
 		private class EhrLabClinicalInfoCache : CacheListAbs<EhrLabClinicalInfo> {
@@ -114,7 +119,7 @@ namespace OpenDentBusiness{
 
 		#endregion
 		*/
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -153,5 +158,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

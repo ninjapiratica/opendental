@@ -1,52 +1,59 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class EhrLabSpecimenRejectReasons {
-		///<summary></summary>
-		public static List<EhrLabSpecimenRejectReason> GetForEhrLabSpecimen(long ehrLabSpecimenNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<EhrLabSpecimenRejectReason>>(MethodBase.GetCurrentMethod(),ehrLabSpecimenNum);
-			}
-			string command="SELECT * FROM ehrlabspecimenrejectreason WHERE EhrLabSpecimenNum = "+POut.Long(ehrLabSpecimenNum);
-			return Crud.EhrLabSpecimenRejectReasonCrud.SelectMany(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class EhrLabSpecimenRejectReasons
+    {
+        ///<summary></summary>
+        public static List<EhrLabSpecimenRejectReason> GetForEhrLabSpecimen(long ehrLabSpecimenNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<EhrLabSpecimenRejectReason>>(MethodBase.GetCurrentMethod(), ehrLabSpecimenNum);
+            }
+            string command = "SELECT * FROM ehrlabspecimenrejectreason WHERE EhrLabSpecimenNum = " + POut.Long(ehrLabSpecimenNum);
+            return Crud.EhrLabSpecimenRejectReasonCrud.SelectMany(command);
+        }
 
-		///<summary></summary>
-		public static void DeleteForLab(long ehrLabNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),ehrLabNum);
-				return;
-			}
-			string command="DELETE FROM ehrlabspecimenrejectreason WHERE EhrLabSpecimenNum IN (SELECT EhrLabSpecimenNum FROM ehrlabspecimen WHERE EhrLabNum="+POut.Long(ehrLabNum)+")";
-			Db.NonQ(command);
-		}
+        ///<summary></summary>
+        public static void DeleteForLab(long ehrLabNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), ehrLabNum);
+                return;
+            }
+            string command = "DELETE FROM ehrlabspecimenrejectreason WHERE EhrLabSpecimenNum IN (SELECT EhrLabSpecimenNum FROM ehrlabspecimen WHERE EhrLabNum=" + POut.Long(ehrLabNum) + ")";
+            Db.NonQ(command);
+        }
 
-		///<summary></summary>
-		public static void DeleteForLabSpecimen(long ehrLabSpecimenNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),ehrLabSpecimenNum);
-				return;
-			}
-			string command="DELETE FROM ehrlabspecimenrejectreason WHERE EhrLabSpecimenNum="+POut.Long(ehrLabSpecimenNum);
-			Db.NonQ(command);
-		}
+        ///<summary></summary>
+        public static void DeleteForLabSpecimen(long ehrLabSpecimenNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), ehrLabSpecimenNum);
+                return;
+            }
+            string command = "DELETE FROM ehrlabspecimenrejectreason WHERE EhrLabSpecimenNum=" + POut.Long(ehrLabSpecimenNum);
+            Db.NonQ(command);
+        }
 
-		///<summary></summary>
-		public static long Insert(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum=Meth.GetLong(MethodBase.GetCurrentMethod(),ehrLabSpecimenRejectReason);
-				return ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum;
-			}
-			return Crud.EhrLabSpecimenRejectReasonCrud.Insert(ehrLabSpecimenRejectReason);
-		}
+        ///<summary></summary>
+        public static long Insert(EhrLabSpecimenRejectReason ehrLabSpecimenRejectReason)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum = Meth.GetLong(MethodBase.GetCurrentMethod(), ehrLabSpecimenRejectReason);
+                return ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum;
+            }
+            return Crud.EhrLabSpecimenRejectReasonCrud.Insert(ehrLabSpecimenRejectReason);
+        }
 
-		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
-		/*
+        //If this table type will exist as cached data, uncomment the CachePattern region below and edit.
+        /*
 		#region CachePattern
 
 		private class EhrLabSpecimenRejectReasonCache : CacheListAbs<EhrLabSpecimenRejectReason> {
@@ -124,7 +131,7 @@ namespace OpenDentBusiness{
 
 		#endregion
 		*/
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -172,5 +179,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

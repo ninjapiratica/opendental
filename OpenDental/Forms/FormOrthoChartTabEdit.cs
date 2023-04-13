@@ -1,41 +1,44 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using OpenDentBusiness;
+using System;
+using System.Windows.Forms;
 
-namespace OpenDental {
-	public partial class FormOrthoChartTabEdit:FormODBase {
+namespace OpenDental
+{
+    public partial class FormOrthoChartTabEdit : FormODBase
+    {
 
-		private OrthoChartTab _orthoChartTab=null;
+        private OrthoChartTab _orthoChartTab = null;
 
-		public FormOrthoChartTabEdit(OrthoChartTab orthoChartTab) {
-			InitializeComponent();
-			InitializeLayoutManager();
-			Lan.F(this);
-			_orthoChartTab=orthoChartTab;
-		}
+        public FormOrthoChartTabEdit(OrthoChartTab orthoChartTab)
+        {
+            InitializeComponent();
+            InitializeLayoutManager();
+            Lan.F(this);
+            _orthoChartTab = orthoChartTab;
+        }
 
-		private void FormOrthoChartTabEdit_Load(object sender,EventArgs e) {
-			textTabName.Text=_orthoChartTab.TabName;
-			checkIsHidden.Checked=_orthoChartTab.IsHidden;
-		}
+        private void FormOrthoChartTabEdit_Load(object sender, EventArgs e)
+        {
+            textTabName.Text = _orthoChartTab.TabName;
+            checkIsHidden.Checked = _orthoChartTab.IsHidden;
+        }
 
-		private void butOK_Click(object sender,EventArgs e) {
-			if(textTabName.Text.Trim()=="") {
-				MsgBox.Show(this,"Tab Name cannot be blank.");
-				return;
-			}
-			_orthoChartTab.TabName=textTabName.Text;
-			_orthoChartTab.IsHidden=checkIsHidden.Checked;
-			DialogResult=DialogResult.OK;
-		}
+        private void butOK_Click(object sender, EventArgs e)
+        {
+            if (textTabName.Text.Trim() == "")
+            {
+                MsgBox.Show(this, "Tab Name cannot be blank.");
+                return;
+            }
+            _orthoChartTab.TabName = textTabName.Text;
+            _orthoChartTab.IsHidden = checkIsHidden.Checked;
+            DialogResult = DialogResult.OK;
+        }
 
-		private void butCancel_Click(object sender,EventArgs e) {
-			DialogResult=DialogResult.Cancel;
-		}
+        private void butCancel_Click(object sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+        }
 
-	}
+    }
 }

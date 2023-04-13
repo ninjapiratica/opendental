@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using DataConnectionBase;
 
-namespace OpenDentBusiness {
-	public class RpNewPatients {
+namespace OpenDentBusiness
+{
+    public class RpNewPatients
+    {
 
-		public static DataTable GetNewPatients(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,bool includeAddress,bool excludeNoProd,bool hasAllProvs) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,includeAddress,excludeNoProd,hasAllProvs);
-			}
-			//used to limit procedurelog in query, getting codenums from the cache so we don't have to join the procedurecode table.
-			string missApptProcs = String.Join(",",ProcedureCodes.GetWhere(x => new List<string>{ "D9986","D9987"}.Contains(x.ProcCode)).Select(x => x.CodeNum));
-			string addressFields = ",patient.Preferred,patient.Address,patient.Address2,patient.City,patient.State,patient.Zip ";
-			string provWhere = $" AND patient.PriProv IN({String.Join(",",listProvNums)}) ";
-			string query = $@"SET @pos=0;
+        public static DataTable GetNewPatients(DateTime dateFrom, DateTime dateTo, List<long> listProvNums, bool includeAddress, bool excludeNoProd, bool hasAllProvs)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetTable(MethodBase.GetCurrentMethod(), dateFrom, dateTo, listProvNums, includeAddress, excludeNoProd, hasAllProvs);
+            }
+            //used to limit procedurelog in query, getting codenums from the cache so we don't have to join the procedurecode table.
+            string missApptProcs = String.Join(",", ProcedureCodes.GetWhere(x => new List<string> { "D9986", "D9987" }.Contains(x.ProcCode)).Select(x => x.CodeNum));
+            string addressFields = ",patient.Preferred,patient.Address,patient.Address2,patient.City,patient.State,patient.Zip ";
+            string provWhere = $" AND patient.PriProv IN({String.Join(",", listProvNums)}) ";
+            string query = $@"SET @pos=0;
 				SELECT
 				    @pos:=@pos+1 patCount,
 				    result.*
@@ -32,7 +35,7 @@ namespace OpenDentBusiness {
 				        WHERE table1.PatNum=procedurelog.PatNum
 				            AND procedurelog.ProcStatus={POut.Int((int)ProcStat.C)}
 				        ) $HowMuch
-								{(includeAddress? addressFields : "")}
+								{(includeAddress ? addressFields : "")}
 				    FROM (
 				        SELECT
 				            PatNum,
@@ -57,13 +60,13 @@ namespace OpenDentBusiness {
 				    LEFT JOIN referral
 				        ON referral.ReferralNum=refattach.ReferralNum
 				    WHERE DATE(table1.dateFirstProc) BETWEEN DATE({POut.Date(dateFrom)}) AND DATE({POut.Date(dateTo)})
-						{(!hasAllProvs? provWhere : "")}
-				    GROUP BY patient.LName,patient.FName,patient.PatNum,CONCAT(referral.LName,IF(referral.FName='','',','),referral.FName){(includeAddress? addressFields : "")}
+						{(!hasAllProvs ? provWhere : "")}
+				    GROUP BY patient.LName,patient.FName,patient.PatNum,CONCAT(referral.LName,IF(referral.FName='','',','),referral.FName){(includeAddress ? addressFields : "")}
 				    ORDER BY dateFirstProc,patient.LName,patient.FName
 				) result
-				{(excludeNoProd? "HAVING $HowMuch > 0" : "")}";
+				{(excludeNoProd ? "HAVING $HowMuch > 0" : "")}";
 
-			return ReportsComplex.RunFuncOnReportServer(() => Db.GetTable(query));
-		}
-	}
+            return ReportsComplex.RunFuncOnReportServer(() => Db.GetTable(query));
+        }
+    }
 }

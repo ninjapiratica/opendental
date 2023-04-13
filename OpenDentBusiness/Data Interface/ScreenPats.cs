@@ -1,39 +1,44 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness {
-	///<summary></summary>
-	public class ScreenPats {
-		///<summary></summary>
-		public static long Insert(ScreenPat screenPat) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				screenPat.ScreenPatNum=Meth.GetLong(MethodBase.GetCurrentMethod(),screenPat);
-				return screenPat.ScreenPatNum;
-			}
-			return Crud.ScreenPatCrud.Insert(screenPat);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class ScreenPats
+    {
+        ///<summary></summary>
+        public static long Insert(ScreenPat screenPat)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                screenPat.ScreenPatNum = Meth.GetLong(MethodBase.GetCurrentMethod(), screenPat);
+                return screenPat.ScreenPatNum;
+            }
+            return Crud.ScreenPatCrud.Insert(screenPat);
+        }
 
-		/// <summary></summary>
-		public static List<ScreenPat> GetForScreenGroup(long screenGroupNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<ScreenPat>>(MethodBase.GetCurrentMethod(),screenGroupNum);
-			}
-			string command="SELECT * FROM screenpat WHERE ScreenGroupNum ="+POut.Long(screenGroupNum);
-			return Crud.ScreenPatCrud.SelectMany(command);
-		}
+        /// <summary></summary>
+        public static List<ScreenPat> GetForScreenGroup(long screenGroupNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<ScreenPat>>(MethodBase.GetCurrentMethod(), screenGroupNum);
+            }
+            string command = "SELECT * FROM screenpat WHERE ScreenGroupNum =" + POut.Long(screenGroupNum);
+            return Crud.ScreenPatCrud.SelectMany(command);
+        }
 
-		///<summary>Inserts, updates, or deletes rows to reflect changes between listScreenPats and stale listScreenPatsOld.</summary>
-		public static bool Sync(List<ScreenPat> listScreenPats,List<ScreenPat> listScreenPatsOld) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),listScreenPats,listScreenPatsOld);
-			}
-			return Crud.ScreenPatCrud.Sync(listScreenPats,listScreenPatsOld);
-		}
+        ///<summary>Inserts, updates, or deletes rows to reflect changes between listScreenPats and stale listScreenPatsOld.</summary>
+        public static bool Sync(List<ScreenPat> listScreenPats, List<ScreenPat> listScreenPatsOld)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetBool(MethodBase.GetCurrentMethod(), listScreenPats, listScreenPatsOld);
+            }
+            return Crud.ScreenPatCrud.Sync(listScreenPats, listScreenPatsOld);
+        }
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -73,5 +78,5 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }

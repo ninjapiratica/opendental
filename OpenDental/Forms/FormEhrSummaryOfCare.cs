@@ -1,375 +1,436 @@
-﻿using System;
-using System.IO;
+﻿using CodeBase;
+using OpenDental.UI;
+using OpenDentBusiness;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using OpenDentBusiness;
-using CodeBase;
 using System.Xml;
-using OpenDental.UI;
 
-namespace OpenDental {
-	public partial class FormEhrSummaryOfCare:FormODBase {
-		public Patient PatCur;
-		private List<EhrMeasureEvent> _listHistorySent;
-		private List<EhrSummaryCcd> _listCcdRec;
+namespace OpenDental
+{
+    public partial class FormEhrSummaryOfCare : FormODBase
+    {
+        public Patient PatCur;
+        private List<EhrMeasureEvent> _listHistorySent;
+        private List<EhrSummaryCcd> _listCcdRec;
 
-		public FormEhrSummaryOfCare() {
-			InitializeComponent();
-			InitializeLayoutManager();
-		}
+        public FormEhrSummaryOfCare()
+        {
+            InitializeComponent();
+            InitializeLayoutManager();
+        }
 
-		private void FormSummaryOfCare_Load(object sender,EventArgs e) {
-			FillGridSent();
-			FillGridRec();
-		}
+        private void FormSummaryOfCare_Load(object sender, EventArgs e)
+        {
+            FillGridSent();
+            FillGridRec();
+        }
 
-		private void FillGridSent() {
-			List<RefAttach> listRefAttaches;
-			gridSent.BeginUpdate();
-			gridSent.Columns.Clear();
-			GridColumn col=new GridColumn("DateTime",130,HorizontalAlignment.Center);
-			gridSent.Columns.Add(col);
-			col=new GridColumn("Meets",140,HorizontalAlignment.Center);
-			gridSent.Columns.Add(col);
-			_listHistorySent=EhrMeasureEvents.RefreshByType(PatCur.PatNum,EhrMeasureEventType.SummaryOfCareProvidedToDr);
-			listRefAttaches=RefAttaches.GetRefAttachesForSummaryOfCareForPat(PatCur.PatNum);
-			gridSent.ListGridRows.Clear();
-			GridRow row;
-			for(int i=0;i<_listHistorySent.Count;i++) {
-				row=new GridRow();
-				row.Cells.Add(_listHistorySent[i].DateTEvent.ToString());
-				if(_listHistorySent[i].FKey==0) {
-					row.Cells.Add("");
-				}
-				else {
-					//Only add an X in the grid for the measure events that meet the summary of care measure so that users can see which ones meet.
-					for(int j=0;j<listRefAttaches.Count;j++) {
-						if(listRefAttaches[j].RefAttachNum==_listHistorySent[i].FKey) {
-							row.Cells.Add("X");
-							break;
-						}
-					}
-				}
-				gridSent.ListGridRows.Add(row);
-			}
-			gridSent.EndUpdate();
-		}
+        private void FillGridSent()
+        {
+            List<RefAttach> listRefAttaches;
+            gridSent.BeginUpdate();
+            gridSent.Columns.Clear();
+            GridColumn col = new GridColumn("DateTime", 130, HorizontalAlignment.Center);
+            gridSent.Columns.Add(col);
+            col = new GridColumn("Meets", 140, HorizontalAlignment.Center);
+            gridSent.Columns.Add(col);
+            _listHistorySent = EhrMeasureEvents.RefreshByType(PatCur.PatNum, EhrMeasureEventType.SummaryOfCareProvidedToDr);
+            listRefAttaches = RefAttaches.GetRefAttachesForSummaryOfCareForPat(PatCur.PatNum);
+            gridSent.ListGridRows.Clear();
+            GridRow row;
+            for (int i = 0; i < _listHistorySent.Count; i++)
+            {
+                row = new GridRow();
+                row.Cells.Add(_listHistorySent[i].DateTEvent.ToString());
+                if (_listHistorySent[i].FKey == 0)
+                {
+                    row.Cells.Add("");
+                }
+                else
+                {
+                    //Only add an X in the grid for the measure events that meet the summary of care measure so that users can see which ones meet.
+                    for (int j = 0; j < listRefAttaches.Count; j++)
+                    {
+                        if (listRefAttaches[j].RefAttachNum == _listHistorySent[i].FKey)
+                        {
+                            row.Cells.Add("X");
+                            break;
+                        }
+                    }
+                }
+                gridSent.ListGridRows.Add(row);
+            }
+            gridSent.EndUpdate();
+        }
 
-		private void gridSent_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			using FormReferralsPatient FormRP=new FormReferralsPatient();
-			FormRP.DefaultRefAttachNum=_listHistorySent[gridSent.GetSelectedIndex()].FKey;
-			FormRP.PatNum=PatCur.PatNum;
-			FormRP.IsSelectionMode=true;
-			if(FormRP.ShowDialog()==DialogResult.Cancel) {
-				return;
-			}
-			_listHistorySent[gridSent.GetSelectedIndex()].FKey=FormRP.RefAttachNum;
-			EhrMeasureEvents.Update(_listHistorySent[gridSent.GetSelectedIndex()]);
-			FillGridSent();
-		}
+        private void gridSent_CellDoubleClick(object sender, ODGridClickEventArgs e)
+        {
+            using FormReferralsPatient FormRP = new FormReferralsPatient();
+            FormRP.DefaultRefAttachNum = _listHistorySent[gridSent.GetSelectedIndex()].FKey;
+            FormRP.PatNum = PatCur.PatNum;
+            FormRP.IsSelectionMode = true;
+            if (FormRP.ShowDialog() == DialogResult.Cancel)
+            {
+                return;
+            }
+            _listHistorySent[gridSent.GetSelectedIndex()].FKey = FormRP.RefAttachNum;
+            EhrMeasureEvents.Update(_listHistorySent[gridSent.GetSelectedIndex()]);
+            FillGridSent();
+        }
 
-		private void FillGridRec() {
-			gridRec.BeginUpdate();
-			gridRec.Columns.Clear();
-			GridColumn col=new GridColumn("DateTime",140,HorizontalAlignment.Center);
-			gridRec.Columns.Add(col);
-			_listCcdRec=EhrSummaryCcds.Refresh(PatCur.PatNum);
-			gridRec.ListGridRows.Clear();
-			GridRow row;
-			for(int i=0;i<_listCcdRec.Count;i++) {
-				row=new GridRow();
-				row.Cells.Add(_listCcdRec[i].DateSummary.ToShortDateString());
-				gridRec.ListGridRows.Add(row);
-			}
-			gridRec.EndUpdate();
-		}
+        private void FillGridRec()
+        {
+            gridRec.BeginUpdate();
+            gridRec.Columns.Clear();
+            GridColumn col = new GridColumn("DateTime", 140, HorizontalAlignment.Center);
+            gridRec.Columns.Add(col);
+            _listCcdRec = EhrSummaryCcds.Refresh(PatCur.PatNum);
+            gridRec.ListGridRows.Clear();
+            GridRow row;
+            for (int i = 0; i < _listCcdRec.Count; i++)
+            {
+                row = new GridRow();
+                row.Cells.Add(_listCcdRec[i].DateSummary.ToShortDateString());
+                gridRec.ListGridRows.Add(row);
+            }
+            gridRec.EndUpdate();
+        }
 
-		private void gridRec_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			string xmltext=_listCcdRec[gridRec.GetSelectedIndex()].ContentSummary;
-			DisplayCCD(xmltext,PatCur);
-		}
+        private void gridRec_CellDoubleClick(object sender, ODGridClickEventArgs e)
+        {
+            string xmltext = _listCcdRec[gridRec.GetSelectedIndex()].ContentSummary;
+            DisplayCCD(xmltext, PatCur);
+        }
 
-		///<summary>Returns true if user performed a print job on the CCD.  Cannot be moved to OpenDentBusiness/Misc/EhrCCD.cs, because this function uses windows UI components.  
-		///Strictly used for displaying CCD messages.  Will not allow user to reconcile meds, problems, or allergies into the patient's account.</summary>
-		public static bool DisplayCCD(string strXmlCCD) {
-			return DisplayCCD(strXmlCCD,null);
-		}
+        ///<summary>Returns true if user performed a print job on the CCD.  Cannot be moved to OpenDentBusiness/Misc/EhrCCD.cs, because this function uses windows UI components.  
+        ///Strictly used for displaying CCD messages.  Will not allow user to reconcile meds, problems, or allergies into the patient's account.</summary>
+        public static bool DisplayCCD(string strXmlCCD)
+        {
+            return DisplayCCD(strXmlCCD, null);
+        }
 
-		public static bool DisplayCCD(string strXmlCCD,Patient patCur) {
-			return DisplayCCD(strXmlCCD,patCur,"");
-		}
+        public static bool DisplayCCD(string strXmlCCD, Patient patCur)
+        {
+            return DisplayCCD(strXmlCCD, patCur, "");
+        }
 
-		///<summary>Returns true if user performed a print job on the CCD.  Cannot be moved to OpenDentBusiness/Misc/EhrCCD.cs, because this function uses windows UI components. 
-		///Pass in a valid patient if the CCD is being displayed to reconcile (incoporate into patient record) medications and/or problems and/or allergies.
-		///patCur can be null, or patCur.PatNum can be 0, to hide the three reconcile buttons. 
-		///strXmlCCD is the actual text of the CCD. 
-		///strAlterateFilPathXslCCD is a full file path to an alternative style sheet. 
-		///This file will only be used in the case where the EHR dll version of the stylesheet couldn not be loaded. 
-		///If neither method works for attaining the stylesheet then an excption will be thrown.</summary>
-		public static bool DisplayCCD(string strXmlCCD,Patient patCur,string strAlterateFilPathXslCCD) {
-			//string xmltext=GetSampleMissingStylesheet();
-			XmlDocument doc=new XmlDocument();
-			try {
-				doc.LoadXml(strXmlCCD);
-			}
-			catch {
-				throw new XmlException("Invalid XML");
-			}
-			string xmlFileName="";
-			string xslFileName="";
-			string xslContents="";
-			if(doc.DocumentElement.Name.ToLower()=="clinicaldocument") {//CCD, CCDA, and C32.
-				xmlFileName="ccd.xml";
-				xslFileName="ccd.xsl";
-				xslContents=FormEHR.GetEhrResource("CCD");
-				if(xslContents=="") { //XSL load from EHR dll failed so see if caller provided an alternative
-					if(strAlterateFilPathXslCCD!="") { //alternative XSL file was provided so use that for our stylesheet
-						xslContents=FileAtoZ.ReadAllText(strAlterateFilPathXslCCD);
-					}
-				}
-				if(xslContents=="") { //one last check to see if we succeeded in finding a stylesheet
-					throw new Exception("No stylesheet found");
-				}
-			}
-			else if(doc.DocumentElement.Name.ToLower()=="continuityofcarerecord" || doc.DocumentElement.Name.ToLower()=="ccr:continuityofcarerecord") {//CCR
-				xmlFileName="ccr.xml";
-				xslFileName="ccr.xsl";
-				xslContents=FormEHR.GetEhrResource("CCR");
-			}
-			else {
-				MessageBox.Show("This is not a valid CCD, CCDA, CCR, or C32 message.  Only the raw text will be shown");
-				MessageBox.Show(strXmlCCD);
-				return false;
-			}
-			XmlNode node=doc.SelectSingleNode("/processing-instruction(\"xml-stylesheet\")");
-			if(node==null) {//document does not contain any stylesheet instruction, so add one
-				XmlProcessingInstruction pi=doc.CreateProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\""+xslFileName+"\"");
-				doc.InsertAfter(pi,doc.ChildNodes[0]);
-			}
-			else {//alter the existing instruction
-				XmlProcessingInstruction pi=(XmlProcessingInstruction)node;
-				pi.Value="type=\"text/xsl\" href=\""+xslFileName+"\"";
-			}
-			File.WriteAllText(Path.Combine(PrefC.GetTempFolderPath(),xmlFileName),doc.InnerXml.ToString());
-			File.WriteAllText(Path.Combine(PrefC.GetTempFolderPath(),xslFileName),xslContents);
-			using FormEhrSummaryCcdEdit formESCD=new FormEhrSummaryCcdEdit(ODFileUtils.CombinePaths(PrefC.GetTempFolderPath(),xmlFileName),patCur);
-			formESCD.ShowDialog();
-			string[] arrayFileNames={"ccd.xml","ccd.xsl","ccr.xml","ccr.xsl"};
-			for(int i=0;i<arrayFileNames.Length;i++) {
-				try {
-					File.Delete(ODFileUtils.CombinePaths(PrefC.GetTempFolderPath(),arrayFileNames[i]));
-				}
-				catch {
-					//Do nothing because the file could have been in use or there were not sufficient permissions.
-					//This file will most likely get deleted next time a file is created.
-				}
-			}
-			return formESCD.DidPrint;
-		}
+        ///<summary>Returns true if user performed a print job on the CCD.  Cannot be moved to OpenDentBusiness/Misc/EhrCCD.cs, because this function uses windows UI components. 
+        ///Pass in a valid patient if the CCD is being displayed to reconcile (incoporate into patient record) medications and/or problems and/or allergies.
+        ///patCur can be null, or patCur.PatNum can be 0, to hide the three reconcile buttons. 
+        ///strXmlCCD is the actual text of the CCD. 
+        ///strAlterateFilPathXslCCD is a full file path to an alternative style sheet. 
+        ///This file will only be used in the case where the EHR dll version of the stylesheet couldn not be loaded. 
+        ///If neither method works for attaining the stylesheet then an excption will be thrown.</summary>
+        public static bool DisplayCCD(string strXmlCCD, Patient patCur, string strAlterateFilPathXslCCD)
+        {
+            //string xmltext=GetSampleMissingStylesheet();
+            XmlDocument doc = new XmlDocument();
+            try
+            {
+                doc.LoadXml(strXmlCCD);
+            }
+            catch
+            {
+                throw new XmlException("Invalid XML");
+            }
+            string xmlFileName = "";
+            string xslFileName = "";
+            string xslContents = "";
+            if (doc.DocumentElement.Name.ToLower() == "clinicaldocument")
+            {//CCD, CCDA, and C32.
+                xmlFileName = "ccd.xml";
+                xslFileName = "ccd.xsl";
+                xslContents = FormEHR.GetEhrResource("CCD");
+                if (xslContents == "")
+                { //XSL load from EHR dll failed so see if caller provided an alternative
+                    if (strAlterateFilPathXslCCD != "")
+                    { //alternative XSL file was provided so use that for our stylesheet
+                        xslContents = FileAtoZ.ReadAllText(strAlterateFilPathXslCCD);
+                    }
+                }
+                if (xslContents == "")
+                { //one last check to see if we succeeded in finding a stylesheet
+                    throw new Exception("No stylesheet found");
+                }
+            }
+            else if (doc.DocumentElement.Name.ToLower() == "continuityofcarerecord" || doc.DocumentElement.Name.ToLower() == "ccr:continuityofcarerecord")
+            {//CCR
+                xmlFileName = "ccr.xml";
+                xslFileName = "ccr.xsl";
+                xslContents = FormEHR.GetEhrResource("CCR");
+            }
+            else
+            {
+                MessageBox.Show("This is not a valid CCD, CCDA, CCR, or C32 message.  Only the raw text will be shown");
+                MessageBox.Show(strXmlCCD);
+                return false;
+            }
+            XmlNode node = doc.SelectSingleNode("/processing-instruction(\"xml-stylesheet\")");
+            if (node == null)
+            {//document does not contain any stylesheet instruction, so add one
+                XmlProcessingInstruction pi = doc.CreateProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + xslFileName + "\"");
+                doc.InsertAfter(pi, doc.ChildNodes[0]);
+            }
+            else
+            {//alter the existing instruction
+                XmlProcessingInstruction pi = (XmlProcessingInstruction)node;
+                pi.Value = "type=\"text/xsl\" href=\"" + xslFileName + "\"";
+            }
+            File.WriteAllText(Path.Combine(PrefC.GetTempFolderPath(), xmlFileName), doc.InnerXml.ToString());
+            File.WriteAllText(Path.Combine(PrefC.GetTempFolderPath(), xslFileName), xslContents);
+            using FormEhrSummaryCcdEdit formESCD = new FormEhrSummaryCcdEdit(ODFileUtils.CombinePaths(PrefC.GetTempFolderPath(), xmlFileName), patCur);
+            formESCD.ShowDialog();
+            string[] arrayFileNames = { "ccd.xml", "ccd.xsl", "ccr.xml", "ccr.xsl" };
+            for (int i = 0; i < arrayFileNames.Length; i++)
+            {
+                try
+                {
+                    File.Delete(ODFileUtils.CombinePaths(PrefC.GetTempFolderPath(), arrayFileNames[i]));
+                }
+                catch
+                {
+                    //Do nothing because the file could have been in use or there were not sufficient permissions.
+                    //This file will most likely get deleted next time a file is created.
+                }
+            }
+            return formESCD.DidPrint;
+        }
 
-		private void butExport_Click(object sender,EventArgs e) {
-			//Generate the CCD first so that any validation errors are apparent and up front.
-			//It is better to not let the user waste their time creating a referral if there is a basic validation issue with the CCD generation.
-			string ccd="";
-			try {
-				ccd=EhrCCD.GenerateSummaryOfCare(PatCur);
-			}
-			catch(Exception ex) {
-				MessageBox.Show(ex.Message);
-				return;
-			}
-			using FormReferralsPatient FormRP=new FormReferralsPatient();
-			FormRP.PatNum=PatCur.PatNum;
-			FormRP.IsSelectionMode=true;
-			if(FormRP.ShowDialog()==DialogResult.Cancel) {
-				MessageBox.Show("Summary of Care not exported.");
-				return;
-			}
-			using FolderBrowserDialog dlg=new FolderBrowserDialog();
-			dlg.SelectedPath=ImageStore.GetPatientFolder(PatCur,ImageStore.GetPreferredAtoZpath());//Default to patient image folder.
-			DialogResult result=dlg.ShowDialog();
-			if(result!=DialogResult.OK) {
-				return;
-			}
-			if(File.Exists(Path.Combine(dlg.SelectedPath,"ccd.xml"))) {
-				if(MessageBox.Show("Overwrite existing ccd.xml?","",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
-					return;
-				}
-			}
-			File.WriteAllText(Path.Combine(dlg.SelectedPath,"ccd.xml"),ccd);
-			File.WriteAllText(Path.Combine(dlg.SelectedPath,"ccd.xsl"),FormEHR.GetEhrResource("CCD"));
-			EhrMeasureEvent newMeasureEvent = new EhrMeasureEvent();
-			newMeasureEvent.DateTEvent = DateTime.Now;
-			newMeasureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDr;
-			newMeasureEvent.PatNum = PatCur.PatNum;
-			newMeasureEvent.FKey=FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
-			long fkey=EhrMeasureEvents.Insert(newMeasureEvent);
-			newMeasureEvent=new EhrMeasureEvent();
-			newMeasureEvent.DateTEvent=DateTime.Now;
-			newMeasureEvent.FKey=fkey;
-			newMeasureEvent.EventType=EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic;
-			newMeasureEvent.PatNum=PatCur.PatNum;
-			newMeasureEvent.FKey=FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
-			EhrMeasureEvents.Insert(newMeasureEvent);
-			FillGridSent();
-			MessageBox.Show("Exported");
-		}
+        private void butExport_Click(object sender, EventArgs e)
+        {
+            //Generate the CCD first so that any validation errors are apparent and up front.
+            //It is better to not let the user waste their time creating a referral if there is a basic validation issue with the CCD generation.
+            string ccd = "";
+            try
+            {
+                ccd = EhrCCD.GenerateSummaryOfCare(PatCur);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            using FormReferralsPatient FormRP = new FormReferralsPatient();
+            FormRP.PatNum = PatCur.PatNum;
+            FormRP.IsSelectionMode = true;
+            if (FormRP.ShowDialog() == DialogResult.Cancel)
+            {
+                MessageBox.Show("Summary of Care not exported.");
+                return;
+            }
+            using FolderBrowserDialog dlg = new FolderBrowserDialog();
+            dlg.SelectedPath = ImageStore.GetPatientFolder(PatCur, ImageStore.GetPreferredAtoZpath());//Default to patient image folder.
+            DialogResult result = dlg.ShowDialog();
+            if (result != DialogResult.OK)
+            {
+                return;
+            }
+            if (File.Exists(Path.Combine(dlg.SelectedPath, "ccd.xml")))
+            {
+                if (MessageBox.Show("Overwrite existing ccd.xml?", "", MessageBoxButtons.OKCancel) != DialogResult.OK)
+                {
+                    return;
+                }
+            }
+            File.WriteAllText(Path.Combine(dlg.SelectedPath, "ccd.xml"), ccd);
+            File.WriteAllText(Path.Combine(dlg.SelectedPath, "ccd.xsl"), FormEHR.GetEhrResource("CCD"));
+            EhrMeasureEvent newMeasureEvent = new EhrMeasureEvent();
+            newMeasureEvent.DateTEvent = DateTime.Now;
+            newMeasureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDr;
+            newMeasureEvent.PatNum = PatCur.PatNum;
+            newMeasureEvent.FKey = FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
+            long fkey = EhrMeasureEvents.Insert(newMeasureEvent);
+            newMeasureEvent = new EhrMeasureEvent();
+            newMeasureEvent.DateTEvent = DateTime.Now;
+            newMeasureEvent.FKey = fkey;
+            newMeasureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic;
+            newMeasureEvent.PatNum = PatCur.PatNum;
+            newMeasureEvent.FKey = FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
+            EhrMeasureEvents.Insert(newMeasureEvent);
+            FillGridSent();
+            MessageBox.Show("Exported");
+        }
 
-		private void butSendEmail_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.EmailSend)) {
-				return;
-			}
-			//Generate the CCD first so that any validation errors are apparent and up front.
-			//It is better to not let the user waste their time creating a referral if there is a basic validation issue with the CCD generation.
-			string ccd="";
-			try {
-				ccd=EhrCCD.GenerateSummaryOfCare(PatCur);
-			}
-			catch(Exception ex) {
-				MessageBox.Show(ex.Message);
-				return;
-			}
-			using FormReferralsPatient FormRP=new FormReferralsPatient();
-			FormRP.PatNum=PatCur.PatNum;
-			FormRP.IsSelectionMode=true;
-			if(FormRP.ShowDialog()==DialogResult.Cancel) {
-				MessageBox.Show("Summary of Care not exported.");
-				return;
-			}
-			Cursor=Cursors.WaitCursor;
-			EmailAddress emailAddressFrom=EmailAddresses.GetByClinic(0);//Default for clinic/practice.
-			EmailMessage emailMessage=new EmailMessage();
-			emailMessage.PatNum=PatCur.PatNum;
-			emailMessage.MsgDateTime=DateTime.Now;
-			emailMessage.SentOrReceived=EmailSentOrReceived.Neither;//To force FormEmailMessageEdit into "compose" mode.
-			emailMessage.FromAddress=emailAddressFrom.EmailUsername;//Cannot be emailAddressFrom.SenderAddress, because it would cause encryption to fail.
-			emailMessage.ToAddress="";//User must set inside of FormEmailMessageEdit
-			emailMessage.Subject="Summary of Care";
-			emailMessage.BodyText="Summary of Care";
-			emailMessage.MsgType=EmailMessageSource.EHR;
-			try {
-				emailMessage.Attachments.Add(EmailAttaches.CreateAttach("ccd.xml",Encoding.UTF8.GetBytes(ccd)));
-				emailMessage.Attachments.Add(EmailAttaches.CreateAttach("ccd.xsl",Encoding.UTF8.GetBytes(FormEHR.GetEhrResource("CCD"))));
-			}
-			catch(Exception ex) {
-				Cursor=Cursors.Default;
-				MessageBox.Show(ex.Message);
-				return;
-			}
-			EmailMessages.Insert(emailMessage);
-			using FormEmailMessageEdit formE=new FormEmailMessageEdit(emailMessage,emailAddressFrom);//Not "new" message because it already exists in db due to pre-insert.
-			if(formE.ShowDialog()==DialogResult.OK) {
-				EhrMeasureEvent newMeasureEvent=new EhrMeasureEvent();
-				newMeasureEvent.DateTEvent=DateTime.Now;
-				newMeasureEvent.EventType=EhrMeasureEventType.SummaryOfCareProvidedToDr;
-				newMeasureEvent.PatNum=PatCur.PatNum;
-				newMeasureEvent.FKey=FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
-				EhrMeasureEvents.Insert(newMeasureEvent);
-				newMeasureEvent=new EhrMeasureEvent();
-				newMeasureEvent.DateTEvent=DateTime.Now;
-				newMeasureEvent.EventType=EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic;
-				newMeasureEvent.PatNum=PatCur.PatNum;
-				newMeasureEvent.FKey=FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
-				EhrMeasureEvents.Insert(newMeasureEvent);
-				FillGridSent();
-			}
-			Cursor=Cursors.Default;
-		}
+        private void butSendEmail_Click(object sender, EventArgs e)
+        {
+            if (!Security.IsAuthorized(Permissions.EmailSend))
+            {
+                return;
+            }
+            //Generate the CCD first so that any validation errors are apparent and up front.
+            //It is better to not let the user waste their time creating a referral if there is a basic validation issue with the CCD generation.
+            string ccd = "";
+            try
+            {
+                ccd = EhrCCD.GenerateSummaryOfCare(PatCur);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            using FormReferralsPatient FormRP = new FormReferralsPatient();
+            FormRP.PatNum = PatCur.PatNum;
+            FormRP.IsSelectionMode = true;
+            if (FormRP.ShowDialog() == DialogResult.Cancel)
+            {
+                MessageBox.Show("Summary of Care not exported.");
+                return;
+            }
+            Cursor = Cursors.WaitCursor;
+            EmailAddress emailAddressFrom = EmailAddresses.GetByClinic(0);//Default for clinic/practice.
+            EmailMessage emailMessage = new EmailMessage();
+            emailMessage.PatNum = PatCur.PatNum;
+            emailMessage.MsgDateTime = DateTime.Now;
+            emailMessage.SentOrReceived = EmailSentOrReceived.Neither;//To force FormEmailMessageEdit into "compose" mode.
+            emailMessage.FromAddress = emailAddressFrom.EmailUsername;//Cannot be emailAddressFrom.SenderAddress, because it would cause encryption to fail.
+            emailMessage.ToAddress = "";//User must set inside of FormEmailMessageEdit
+            emailMessage.Subject = "Summary of Care";
+            emailMessage.BodyText = "Summary of Care";
+            emailMessage.MsgType = EmailMessageSource.EHR;
+            try
+            {
+                emailMessage.Attachments.Add(EmailAttaches.CreateAttach("ccd.xml", Encoding.UTF8.GetBytes(ccd)));
+                emailMessage.Attachments.Add(EmailAttaches.CreateAttach("ccd.xsl", Encoding.UTF8.GetBytes(FormEHR.GetEhrResource("CCD"))));
+            }
+            catch (Exception ex)
+            {
+                Cursor = Cursors.Default;
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            EmailMessages.Insert(emailMessage);
+            using FormEmailMessageEdit formE = new FormEmailMessageEdit(emailMessage, emailAddressFrom);//Not "new" message because it already exists in db due to pre-insert.
+            if (formE.ShowDialog() == DialogResult.OK)
+            {
+                EhrMeasureEvent newMeasureEvent = new EhrMeasureEvent();
+                newMeasureEvent.DateTEvent = DateTime.Now;
+                newMeasureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDr;
+                newMeasureEvent.PatNum = PatCur.PatNum;
+                newMeasureEvent.FKey = FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
+                EhrMeasureEvents.Insert(newMeasureEvent);
+                newMeasureEvent = new EhrMeasureEvent();
+                newMeasureEvent.DateTEvent = DateTime.Now;
+                newMeasureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDrElectronic;
+                newMeasureEvent.PatNum = PatCur.PatNum;
+                newMeasureEvent.FKey = FormRP.RefAttachNum;//Can be 0 if user didn't pick a referral for some reason.
+                EhrMeasureEvents.Insert(newMeasureEvent);
+                FillGridSent();
+            }
+            Cursor = Cursors.Default;
+        }
 
-		private void butShowXhtml_Click(object sender,EventArgs e) {
-			using FormReferralsPatient FormRP=new FormReferralsPatient();
-			FormRP.PatNum=PatCur.PatNum;
-			FormRP.IsSelectionMode=true;
-			if(FormRP.ShowDialog()==DialogResult.Cancel) {
-				MessageBox.Show("Summary of Care not shown.");
-				return;
-			}
-			string ccd="";
-			try {
-				ccd=EhrCCD.GenerateSummaryOfCare(PatCur);
-			}
-			catch(Exception ex) {
-				MessageBox.Show(ex.Message);
-				return;
-			}
-			bool didPrint=DisplayCCD(ccd);
-			if(didPrint) {
-				//we are printing a ccd so add new measure event.					
-				EhrMeasureEvent measureEvent = new EhrMeasureEvent();
-				measureEvent.DateTEvent = DateTime.Now;
-				measureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDr;
-				measureEvent.FKey=FormRP.RefAttachNum;
-				measureEvent.PatNum = PatCur.PatNum;
-				EhrMeasureEvents.Insert(measureEvent);
-				FillGridSent();
-			}		
-		}
+        private void butShowXhtml_Click(object sender, EventArgs e)
+        {
+            using FormReferralsPatient FormRP = new FormReferralsPatient();
+            FormRP.PatNum = PatCur.PatNum;
+            FormRP.IsSelectionMode = true;
+            if (FormRP.ShowDialog() == DialogResult.Cancel)
+            {
+                MessageBox.Show("Summary of Care not shown.");
+                return;
+            }
+            string ccd = "";
+            try
+            {
+                ccd = EhrCCD.GenerateSummaryOfCare(PatCur);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            bool didPrint = DisplayCCD(ccd);
+            if (didPrint)
+            {
+                //we are printing a ccd so add new measure event.					
+                EhrMeasureEvent measureEvent = new EhrMeasureEvent();
+                measureEvent.DateTEvent = DateTime.Now;
+                measureEvent.EventType = EhrMeasureEventType.SummaryOfCareProvidedToDr;
+                measureEvent.FKey = FormRP.RefAttachNum;
+                measureEvent.PatNum = PatCur.PatNum;
+                EhrMeasureEvents.Insert(measureEvent);
+                FillGridSent();
+            }
+        }
 
-		private void butShowXml_Click(object sender,EventArgs e) {
-			string ccd="";
-			try {
-				ccd=EhrCCD.GenerateSummaryOfCare(PatCur);
-			}
-			catch(Exception ex) {
-				MessageBox.Show(ex.Message);
-				return;
-			}
-			using MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(ccd);
-			msgbox.ShowDialog();
-		}
+        private void butShowXml_Click(object sender, EventArgs e)
+        {
+            string ccd = "";
+            try
+            {
+                ccd = EhrCCD.GenerateSummaryOfCare(PatCur);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+            using MsgBoxCopyPaste msgbox = new MsgBoxCopyPaste(ccd);
+            msgbox.ShowDialog();
+        }
 
-		private void butRecEmail_Click(object sender,EventArgs e) {
-			using FormEmailInbox form=new FormEmailInbox();
-			form.ShowDialog();
-		}
+        private void butRecEmail_Click(object sender, EventArgs e)
+        {
+            using FormEmailInbox form = new FormEmailInbox();
+            form.ShowDialog();
+        }
 
-		private void butRecFile_Click(object sender,EventArgs e) {
-			using OpenFileDialog dlg=new OpenFileDialog();
-			DialogResult result=dlg.ShowDialog();
-			if(result!=DialogResult.OK){
-				return;
-			}
-			string text=File.ReadAllText(dlg.FileName);
-			EhrSummaryCcd ehrSummaryCcd=new EhrSummaryCcd();
-			ehrSummaryCcd.ContentSummary=text;
-			ehrSummaryCcd.DateSummary=DateTime.Today;
-			ehrSummaryCcd.PatNum=PatCur.PatNum;
-			EhrSummaryCcds.Insert(ehrSummaryCcd);
-			FillGridRec();
-			DisplayCCD(text,PatCur);
-		}
+        private void butRecFile_Click(object sender, EventArgs e)
+        {
+            using OpenFileDialog dlg = new OpenFileDialog();
+            DialogResult result = dlg.ShowDialog();
+            if (result != DialogResult.OK)
+            {
+                return;
+            }
+            string text = File.ReadAllText(dlg.FileName);
+            EhrSummaryCcd ehrSummaryCcd = new EhrSummaryCcd();
+            ehrSummaryCcd.ContentSummary = text;
+            ehrSummaryCcd.DateSummary = DateTime.Today;
+            ehrSummaryCcd.PatNum = PatCur.PatNum;
+            EhrSummaryCcds.Insert(ehrSummaryCcd);
+            FillGridRec();
+            DisplayCCD(text, PatCur);
+        }
 
-		private void butDelete_Click(object sender,EventArgs e) {
-			if(gridSent.SelectedIndices.Length < 1) {
-				MessageBox.Show("Please select at least one record to delete.");
-				return;
-			}
-			for(int i=0;i<gridSent.SelectedIndices.Length;i++) {
-				EhrMeasureEvents.Delete(_listHistorySent[gridSent.SelectedIndices[i]].EhrMeasureEventNum);
-			}
-			FillGridSent();
-		}
+        private void butDelete_Click(object sender, EventArgs e)
+        {
+            if (gridSent.SelectedIndices.Length < 1)
+            {
+                MessageBox.Show("Please select at least one record to delete.");
+                return;
+            }
+            for (int i = 0; i < gridSent.SelectedIndices.Length; i++)
+            {
+                EhrMeasureEvents.Delete(_listHistorySent[gridSent.SelectedIndices[i]].EhrMeasureEventNum);
+            }
+            FillGridSent();
+        }
 
-		private void butClose_Click(object sender,EventArgs e) {
-			Close();
-		}
-
-		
-
-		
-
-		
-	
-
-		
-
-	
-
-	
+        private void butClose_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
 
 
-	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
 }
 
 

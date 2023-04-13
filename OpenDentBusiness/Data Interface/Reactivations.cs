@@ -1,16 +1,17 @@
+using CodeBase;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using CodeBase;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class Reactivations{
-		//If this table type will exist as cached data, uncomment the Cache Pattern region below and edit.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class Reactivations
+    {
+        //If this table type will exist as cached data, uncomment the Cache Pattern region below and edit.
+        /*
 		#region Cache Pattern
 		//This region can be eliminated if this is not a table type with cached data.
 		//If leaving this region in place, be sure to add GetTableFromCache and FillCacheFromTable to the Cache.cs file with all the other Cache types.
@@ -99,81 +100,93 @@ namespace OpenDentBusiness{
 		}
 		#endregion Cache Pattern
 		*/
-		
-		//Only pull out the methods below as you need them.  Otherwise, leave them commented out.
-		#region Get Methods
-		///<summary></summary>
-		public static List<Reactivation> Refresh(long patNum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<Reactivation>>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			string command="SELECT * FROM reactivation WHERE PatNum = "+POut.Long(patNum);
-			return Crud.ReactivationCrud.SelectMany(command);
-		}
-		
-		///<summary>Gets one Reactivation from the db.</summary>
-		public static Reactivation GetOne(long reactivationNum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				return Meth.GetObject<Reactivation>(MethodBase.GetCurrentMethod(),reactivationNum);
-			}
-			return Crud.ReactivationCrud.SelectOne(reactivationNum);
-		}
 
-		public static int GetNumReminders(long patNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				return Meth.GetInt(MethodBase.GetCurrentMethod(),patNum);
-			}
-			long commType=Commlogs.GetTypeAuto(CommItemTypeAuto.REACT);
-			if(commType==0) {
-				return 0;
-			}
-			string cmd=
-				@"SELECT
+        //Only pull out the methods below as you need them.  Otherwise, leave them commented out.
+        #region Get Methods
+        ///<summary></summary>
+        public static List<Reactivation> Refresh(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<Reactivation>>(MethodBase.GetCurrentMethod(), patNum);
+            }
+            string command = "SELECT * FROM reactivation WHERE PatNum = " + POut.Long(patNum);
+            return Crud.ReactivationCrud.SelectMany(command);
+        }
+
+        ///<summary>Gets one Reactivation from the db.</summary>
+        public static Reactivation GetOne(long reactivationNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<Reactivation>(MethodBase.GetCurrentMethod(), reactivationNum);
+            }
+            return Crud.ReactivationCrud.SelectOne(reactivationNum);
+        }
+
+        public static int GetNumReminders(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetInt(MethodBase.GetCurrentMethod(), patNum);
+            }
+            long commType = Commlogs.GetTypeAuto(CommItemTypeAuto.REACT);
+            if (commType == 0)
+            {
+                return 0;
+            }
+            string cmd =
+                @"SELECT
 					COUNT(*) AS NumReminders
 					FROM commlog
-					WHERE commlog.CommType="+POut.Long(commType)+" "+
-					"AND commlog.PatNum="+POut.Long(patNum);
-			return PIn.Int(Db.GetScalar(cmd));
-		}
+					WHERE commlog.CommType=" + POut.Long(commType) + " " +
+                    "AND commlog.PatNum=" + POut.Long(patNum);
+            return PIn.Int(Db.GetScalar(cmd));
+        }
 
-		public static DateTime GetDateLastContacted(long patNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				return Meth.GetObject<DateTime>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			long commType=Commlogs.GetTypeAuto(CommItemTypeAuto.REACT);
-			if(commType==0) {
-				return DateTime.MinValue;
-			}
-			string cmd=
-				@"SELECT
+        public static DateTime GetDateLastContacted(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<DateTime>(MethodBase.GetCurrentMethod(), patNum);
+            }
+            long commType = Commlogs.GetTypeAuto(CommItemTypeAuto.REACT);
+            if (commType == 0)
+            {
+                return DateTime.MinValue;
+            }
+            string cmd =
+                @"SELECT
 					MAX(commlog.CommDateTime) AS DateLastContacted
 					FROM commlog
-					WHERE commlog.CommType="+POut.Long(commType)+" "+
-					"AND commlog.PatNum="+POut.Long(patNum)+" "+
-					"GROUP BY commlog.PatNum";
-			return PIn.DateT(Db.GetScalar(cmd));
-		}
+					WHERE commlog.CommType=" + POut.Long(commType) + " " +
+                    "AND commlog.PatNum=" + POut.Long(patNum) + " " +
+                    "GROUP BY commlog.PatNum";
+            return PIn.DateT(Db.GetScalar(cmd));
+        }
 
-		///<summary>Gets the list of patients that need to be on the reactivation list based on the passed in filters.</summary>
-		public static DataTable GetReactivationList(DateTime dateSince,DateTime dateStop,bool groupFamilies,bool showDoNotContact,bool isInactiveIncluded
-			,long provNum,long clinicNum,long siteNum,long billingType,ReactivationListSort sortBy,RecallListShowNumberReminders showReactivations) 
-		{
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateSince,dateStop,groupFamilies,showDoNotContact,isInactiveIncluded,provNum,clinicNum
-					,siteNum,billingType,sortBy,showReactivations);
-			}
-			//Get information we will need to do the query
-			List<long> listReactCommLogTypeDefNums=Defs.GetDefsForCategory(DefCat.CommLogTypes,isShort:true)
-				.FindAll(x => CommItemTypeAuto.REACT.GetDescription(useShortVersionIfAvailable:true).Equals(x.ItemValue)).Select(x => x.DefNum).ToList();
-			int contactInterval=PrefC.GetInt(PrefName.ReactivationContactInterval);
-			List<PatientStatus> listPatStatuses=new List<PatientStatus>() {PatientStatus.Patient,PatientStatus.Prospective};
-			if(isInactiveIncluded) {
-				listPatStatuses.Add(PatientStatus.Inactive);
-			}
-			string strPatStatuses=string.Join(",",listPatStatuses.Select(x => POut.Int((int)x)));
-			//Get the raw set of patients who should be on the reactivation list
-			string cmd=
-				$@"SELECT 
+        ///<summary>Gets the list of patients that need to be on the reactivation list based on the passed in filters.</summary>
+        public static DataTable GetReactivationList(DateTime dateSince, DateTime dateStop, bool groupFamilies, bool showDoNotContact, bool isInactiveIncluded
+            , long provNum, long clinicNum, long siteNum, long billingType, ReactivationListSort sortBy, RecallListShowNumberReminders showReactivations)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetTable(MethodBase.GetCurrentMethod(), dateSince, dateStop, groupFamilies, showDoNotContact, isInactiveIncluded, provNum, clinicNum
+                    , siteNum, billingType, sortBy, showReactivations);
+            }
+            //Get information we will need to do the query
+            List<long> listReactCommLogTypeDefNums = Defs.GetDefsForCategory(DefCat.CommLogTypes, isShort: true)
+                .FindAll(x => CommItemTypeAuto.REACT.GetDescription(useShortVersionIfAvailable: true).Equals(x.ItemValue)).Select(x => x.DefNum).ToList();
+            int contactInterval = PrefC.GetInt(PrefName.ReactivationContactInterval);
+            List<PatientStatus> listPatStatuses = new List<PatientStatus>() { PatientStatus.Patient, PatientStatus.Prospective };
+            if (isInactiveIncluded)
+            {
+                listPatStatuses.Add(PatientStatus.Inactive);
+            }
+            string strPatStatuses = string.Join(",", listPatStatuses.Select(x => POut.Int((int)x)));
+            //Get the raw set of patients who should be on the reactivation list
+            string cmd =
+                $@"SELECT 
 						pat.PatNum,
 						pat.LName,
 						pat.FName,
@@ -191,7 +204,7 @@ namespace OpenDentBusiness{
 						pat.HmPhone,
 						pat.WirelessPhone,
 						pat.WkPhone,
-						{(groupFamilies?"COALESCE(guarantor.Email,pat.Email,'') AS Email,":"pat.Email,")}
+						{(groupFamilies ? "COALESCE(guarantor.Email,pat.Email,'') AS Email," : "pat.Email,")}
 						MAX(proc.ProcDate) AS DateLastProc,
 						COALESCE(comm.DateLastContacted,'') AS DateLastContacted,
 						COALESCE(comm.ContactedCount,0) AS ContactedCount,
@@ -212,158 +225,177 @@ namespace OpenDentBusiness{
 							MAX(commlog.CommDateTime) AS DateLastContacted,
 							COUNT(*) AS ContactedCount
 							FROM commlog
-							WHERE commlog.CommType IN ({string.Join(",",listReactCommLogTypeDefNums)}) 
+							WHERE commlog.CommType IN ({string.Join(",", listReactCommLogTypeDefNums)}) 
 							GROUP BY commlog.PatNum
 					) comm ON pat.PatNum=comm.PatNum
 					LEFT JOIN reactivation react ON pat.PatNum=react.PatNum
 					LEFT JOIN definition billingtype ON pat.BillingType=billingtype.DefNum
 					INNER JOIN patient guarantor ON pat.Guarantor=guarantor.PatNum
 					WHERE pat.PatStatus IN ({strPatStatuses}) ";
-			cmd+=provNum>0?" AND pat.PriProv="+POut.Long(provNum):"";
-			cmd+=clinicNum>-1?" AND pat.ClinicNum="+POut.Long(clinicNum):"";//might still want to get the 0 clinic pats
-			cmd+=siteNum>0?" AND pat.SiteNum="+POut.Long(siteNum):"";
-			cmd+=billingType>0?" AND pat.BillingType="+POut.Long(billingType):"";
-			cmd+=showDoNotContact?"":" AND (react.DoNotContact IS NULL OR react.DoNotContact=0)"; 
-			cmd+=contactInterval>-1?" AND (comm.DateLastContacted IS NULL OR comm.DateLastContacted <= "+POut.DateT(DateTime.Today.AddDays(-contactInterval))+") ":"";
-			//set number of contact attempts
-			int maxReminds=PrefC.GetInt(PrefName.ReactivationCountContactMax);
-			if(showReactivations==RecallListShowNumberReminders.SixPlus) {
-				cmd+=" AND ContactedCount>=6 "; //don't need to look at pref this only shows in UI if the prefvalue allows it
-			}
-			else if(showReactivations==RecallListShowNumberReminders.Zero) {
-				cmd+=" AND (comm.ContactedCount=0 OR comm.ContactedCount IS NULL) ";
-			}
-			else if(showReactivations!=RecallListShowNumberReminders.All) {
-				int filter=(int)showReactivations-1;
-				//if the contactmax pref is not -1 or 0, and the contactmax is smaller than the requested filter, replace the filter with the contactmax
-				cmd+=" AND comm.ContactedCount="+POut.Int((maxReminds>0&&maxReminds<filter)?maxReminds:filter)+" "; 
-			}
-			else if (showReactivations==RecallListShowNumberReminders.All) { //get all but filter on the contactmax
-				cmd+=" AND (comm.ContactedCount < "+POut.Int(maxReminds)+" OR comm.ContactedCount IS NULL) "; 
-			}
-			cmd+=$@" GROUP BY pat.PatNum 
+            cmd += provNum > 0 ? " AND pat.PriProv=" + POut.Long(provNum) : "";
+            cmd += clinicNum > -1 ? " AND pat.ClinicNum=" + POut.Long(clinicNum) : "";//might still want to get the 0 clinic pats
+            cmd += siteNum > 0 ? " AND pat.SiteNum=" + POut.Long(siteNum) : "";
+            cmd += billingType > 0 ? " AND pat.BillingType=" + POut.Long(billingType) : "";
+            cmd += showDoNotContact ? "" : " AND (react.DoNotContact IS NULL OR react.DoNotContact=0)";
+            cmd += contactInterval > -1 ? " AND (comm.DateLastContacted IS NULL OR comm.DateLastContacted <= " + POut.DateT(DateTime.Today.AddDays(-contactInterval)) + ") " : "";
+            //set number of contact attempts
+            int maxReminds = PrefC.GetInt(PrefName.ReactivationCountContactMax);
+            if (showReactivations == RecallListShowNumberReminders.SixPlus)
+            {
+                cmd += " AND ContactedCount>=6 "; //don't need to look at pref this only shows in UI if the prefvalue allows it
+            }
+            else if (showReactivations == RecallListShowNumberReminders.Zero)
+            {
+                cmd += " AND (comm.ContactedCount=0 OR comm.ContactedCount IS NULL) ";
+            }
+            else if (showReactivations != RecallListShowNumberReminders.All)
+            {
+                int filter = (int)showReactivations - 1;
+                //if the contactmax pref is not -1 or 0, and the contactmax is smaller than the requested filter, replace the filter with the contactmax
+                cmd += " AND comm.ContactedCount=" + POut.Int((maxReminds > 0 && maxReminds < filter) ? maxReminds : filter) + " ";
+            }
+            else if (showReactivations == RecallListShowNumberReminders.All)
+            { //get all but filter on the contactmax
+                cmd += " AND (comm.ContactedCount < " + POut.Int(maxReminds) + " OR comm.ContactedCount IS NULL) ";
+            }
+            cmd += $@" GROUP BY pat.PatNum 
 							HAVING MAX(proc.ProcDate) < {POut.Date(dateSince)} AND MAX(proc.ProcDate) >= {POut.Date(dateStop)}
 							AND MIN(appt.AptDateTime) IS NULL ";
-			//set the sort by
-			switch(sortBy) {
-				case ReactivationListSort.Alphabetical:
-					cmd+=" ORDER BY "+(groupFamilies?"guarantor.LName,guarantor.FName,pat.FName":"pat.LName,pat.FName");
-					break;
-				case ReactivationListSort.BillingType:
-					cmd+=" ORDER BY billingtype.ItemName,DateLastContacted"+(groupFamilies?",guarantor.LName,guarantor.FName":"");
-					break;
-				case ReactivationListSort.LastContacted:
-					cmd+=" ORDER BY IF(comm.DateLastContacted='' OR comm.DateLastContacted IS NULL,1,0),comm.DateLastContacted"+(groupFamilies?",guarantor.LName,guarantor.FName":"");
-					break;
-				case ReactivationListSort.LastSeen:
-					cmd+=" ORDER BY MAX(proc.ProcDate)";
-					break;
-			}
-			DataTable dtReturn=Db.GetTable(cmd);
-			foreach(DataRow row in dtReturn.Rows) {
-				//FOR REVIEW: currently, we are displaying PreferRecallMethod, which is what RecallList also does.  Just want to make sure we don't want to use PreferContactMethod
-				row["ContactMethod"]=Recalls.GetContactFromMethod(PIn.Enum<ContactMethod>(row["PreferRecallMethod"].ToString()),groupFamilies
-						,row["HmPhone"].ToString(),row["WkPhone"].ToString(),row["WirelessPhone"].ToString(),row["Email"].ToString()//guarEmail queried as Email
-						,row["Email"].ToString());//Pat.Email is also "Email"
-			}
-			return dtReturn;
-		}
+            //set the sort by
+            switch (sortBy)
+            {
+                case ReactivationListSort.Alphabetical:
+                    cmd += " ORDER BY " + (groupFamilies ? "guarantor.LName,guarantor.FName,pat.FName" : "pat.LName,pat.FName");
+                    break;
+                case ReactivationListSort.BillingType:
+                    cmd += " ORDER BY billingtype.ItemName,DateLastContacted" + (groupFamilies ? ",guarantor.LName,guarantor.FName" : "");
+                    break;
+                case ReactivationListSort.LastContacted:
+                    cmd += " ORDER BY IF(comm.DateLastContacted='' OR comm.DateLastContacted IS NULL,1,0),comm.DateLastContacted" + (groupFamilies ? ",guarantor.LName,guarantor.FName" : "");
+                    break;
+                case ReactivationListSort.LastSeen:
+                    cmd += " ORDER BY MAX(proc.ProcDate)";
+                    break;
+            }
+            DataTable dtReturn = Db.GetTable(cmd);
+            foreach (DataRow row in dtReturn.Rows)
+            {
+                //FOR REVIEW: currently, we are displaying PreferRecallMethod, which is what RecallList also does.  Just want to make sure we don't want to use PreferContactMethod
+                row["ContactMethod"] = Recalls.GetContactFromMethod(PIn.Enum<ContactMethod>(row["PreferRecallMethod"].ToString()), groupFamilies
+                        , row["HmPhone"].ToString(), row["WkPhone"].ToString(), row["WirelessPhone"].ToString(), row["Email"].ToString()//guarEmail queried as Email
+                        , row["Email"].ToString());//Pat.Email is also "Email"
+            }
+            return dtReturn;
+        }
 
-		///<summary>Follows the format of the Recall addrTable, used in the RecallList to duplicate functionality for mailing/emailing patients.</summary>
-		public static DataTable GetAddrTable(List<Patient> listPats,List<Patient> listGuars,bool groupFamilies,ReactivationListSort sortBy) {
-			DataTable table=Recalls.GetAddrTableStructure();
-			List<Patient> listPatsOrGuars=listPats;//Default to the list of patients passed in.
-			//Utilize listGuars if groupFamilies is true so that family members do not get their own row.
-			if(groupFamilies) {
-				//This makes it so that we only return one family address even if the user has passed in every single member of the family.
-				listPatsOrGuars=listGuars.FindAll(x => listPats.Select(y => y.Guarantor).Contains(x.PatNum));
-			}
-			foreach(Patient pat in listPatsOrGuars) {
-				Patient patCur=pat;//Always the guarantor if grouping by family, otherwise a selected patient.
-				Patient guar=listGuars.FirstOrDefault(x => x.PatNum==pat.Guarantor);
-				//Only include Patients that were selected, rather than all family members.
-				List<Patient> listSelectedPatsInFam=listPats.Where(x => x.Guarantor==guar.PatNum).ToList();
-				if(listSelectedPatsInFam.Count==1) {//Selected patient may not be the guarantor.
-					//So use first selected patient because this will result in an individual postcard, which should show the selected patient's name, not the
-					//name of the guarantor.
-					patCur=listSelectedPatsInFam.First();
-				}
-				DataRow row=table.NewRow();
-				row["address"]						=patCur.Address+(!string.IsNullOrWhiteSpace(patCur.Address2)?Environment.NewLine+patCur.Address2:"");
-				row["City"]								=patCur.City;
-				row["clinicNum"]					=patCur.ClinicNum;
-				row["dateDue"]						=DateTime.MinValue;//This isn't used for reactivations, but it's here keep the table the same as recall addrTable
-				row["email"]							=patCur.Email;
-				row["emailPatNum"]				=patCur.PatNum;
-				row["famList"]						=listSelectedPatsInFam.Count>1 ? string.Join(",",listSelectedPatsInFam.Select(x => x.FName)) : "";
-				row["guarLName"]					=guar.LName;
-				row["numberOfReminders"]	=Reactivations.GetNumReminders(patCur.PatNum);
-				row["patientNameF"]				=patCur.GetNameFirstOrPreferred();
-				row["patientNameFL"]			=patCur.GetNameFLnoPref();
-				row["patNums"]						=patCur.PatNum;
-				row["State"]							=patCur.State;
-				row["Zip"]								=patCur.Zip;
-				table.Rows.Add(row);
-			}
-			return table;
-		}
+        ///<summary>Follows the format of the Recall addrTable, used in the RecallList to duplicate functionality for mailing/emailing patients.</summary>
+        public static DataTable GetAddrTable(List<Patient> listPats, List<Patient> listGuars, bool groupFamilies, ReactivationListSort sortBy)
+        {
+            DataTable table = Recalls.GetAddrTableStructure();
+            List<Patient> listPatsOrGuars = listPats;//Default to the list of patients passed in.
+                                                     //Utilize listGuars if groupFamilies is true so that family members do not get their own row.
+            if (groupFamilies)
+            {
+                //This makes it so that we only return one family address even if the user has passed in every single member of the family.
+                listPatsOrGuars = listGuars.FindAll(x => listPats.Select(y => y.Guarantor).Contains(x.PatNum));
+            }
+            foreach (Patient pat in listPatsOrGuars)
+            {
+                Patient patCur = pat;//Always the guarantor if grouping by family, otherwise a selected patient.
+                Patient guar = listGuars.FirstOrDefault(x => x.PatNum == pat.Guarantor);
+                //Only include Patients that were selected, rather than all family members.
+                List<Patient> listSelectedPatsInFam = listPats.Where(x => x.Guarantor == guar.PatNum).ToList();
+                if (listSelectedPatsInFam.Count == 1)
+                {//Selected patient may not be the guarantor.
+                 //So use first selected patient because this will result in an individual postcard, which should show the selected patient's name, not the
+                 //name of the guarantor.
+                    patCur = listSelectedPatsInFam.First();
+                }
+                DataRow row = table.NewRow();
+                row["address"] = patCur.Address + (!string.IsNullOrWhiteSpace(patCur.Address2) ? Environment.NewLine + patCur.Address2 : "");
+                row["City"] = patCur.City;
+                row["clinicNum"] = patCur.ClinicNum;
+                row["dateDue"] = DateTime.MinValue;//This isn't used for reactivations, but it's here keep the table the same as recall addrTable
+                row["email"] = patCur.Email;
+                row["emailPatNum"] = patCur.PatNum;
+                row["famList"] = listSelectedPatsInFam.Count > 1 ? string.Join(",", listSelectedPatsInFam.Select(x => x.FName)) : "";
+                row["guarLName"] = guar.LName;
+                row["numberOfReminders"] = Reactivations.GetNumReminders(patCur.PatNum);
+                row["patientNameF"] = patCur.GetNameFirstOrPreferred();
+                row["patientNameFL"] = patCur.GetNameFLnoPref();
+                row["patNums"] = patCur.PatNum;
+                row["State"] = patCur.State;
+                row["Zip"] = patCur.Zip;
+                table.Rows.Add(row);
+            }
+            return table;
+        }
 
-		#endregion Get Methods
+        #endregion Get Methods
 
-		#region Insert
-		///<summary></summary>
-		public static long Insert(Reactivation reactivation){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				reactivation.ReactivationNum=Meth.GetLong(MethodBase.GetCurrentMethod(),reactivation);
-				return reactivation.ReactivationNum;
-			}
-			return Crud.ReactivationCrud.Insert(reactivation);
-		}
-		#endregion Insert
+        #region Insert
+        ///<summary></summary>
+        public static long Insert(Reactivation reactivation)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                reactivation.ReactivationNum = Meth.GetLong(MethodBase.GetCurrentMethod(), reactivation);
+                return reactivation.ReactivationNum;
+            }
+            return Crud.ReactivationCrud.Insert(reactivation);
+        }
+        #endregion Insert
 
-		#region Update
-		///<summary></summary>
-		public static void Update(Reactivation reactivation){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),reactivation);
-				return;
-			}
-			Crud.ReactivationCrud.Update(reactivation);
-		}
+        #region Update
+        ///<summary></summary>
+        public static void Update(Reactivation reactivation)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), reactivation);
+                return;
+            }
+            Crud.ReactivationCrud.Update(reactivation);
+        }
 
-		public static void UpdateStatus(long reactivationNum,long statusDefNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),reactivationNum,statusDefNum);
-				return;
-			}
-			string cmd="UPDATE reactivation SET ReactivationStatus="+POut.Long(statusDefNum) +" WHERE ReactivationNum="+POut.Long(reactivationNum);
-			Db.NonQ(cmd);
-		}
+        public static void UpdateStatus(long reactivationNum, long statusDefNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), reactivationNum, statusDefNum);
+                return;
+            }
+            string cmd = "UPDATE reactivation SET ReactivationStatus=" + POut.Long(statusDefNum) + " WHERE ReactivationNum=" + POut.Long(reactivationNum);
+            Db.NonQ(cmd);
+        }
 
-		#endregion Update
+        #endregion Update
 
-		#region Delete
-		///<summary></summary>
-		public static void Delete(long reactivationNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),reactivationNum);
-				return;
-			}
-			Crud.ReactivationCrud.Delete(reactivationNum);
-		}
-		#endregion Delete
-	}
+        #region Delete
+        ///<summary></summary>
+        public static void Delete(long reactivationNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), reactivationNum);
+                return;
+            }
+            Crud.ReactivationCrud.Delete(reactivationNum);
+        }
+        #endregion Delete
+    }
 
-	///<summary></summary>
-	public enum ReactivationListSort {
-		///<summary></summary>
-		LastContacted,
-		///<summary></summary>
-		BillingType,
-		///<summary></summary>
-		Alphabetical,
-		///<summary></summary>
-		LastSeen,
-	}
+    ///<summary></summary>
+    public enum ReactivationListSort
+    {
+        ///<summary></summary>
+        LastContacted,
+        ///<summary></summary>
+        BillingType,
+        ///<summary></summary>
+        Alphabetical,
+        ///<summary></summary>
+        LastSeen,
+    }
 
 }

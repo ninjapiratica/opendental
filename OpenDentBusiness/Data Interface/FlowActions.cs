@@ -1,15 +1,14 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class FlowActions{
-		#region commented cache pattern
-		//If this table type will exist as cached data, uncomment the Cache Pattern region below and edit.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class FlowActions
+    {
+        #region commented cache pattern
+        //If this table type will exist as cached data, uncomment the Cache Pattern region below and edit.
+        /*
 		#region Cache Pattern
 		//This region can be eliminated if this is not a table type with cached data.
 		//If leaving this region in place, be sure to add GetTableFromCache and FillCacheFromTable to the Cache.cs file with all the other Cache types.
@@ -98,68 +97,80 @@ namespace OpenDentBusiness{
 		}
 		#endregion Cache Pattern
 		*/
-		#endregion
-		#region Methods - Get
-		///<summary></summary>
-		public static List<FlowAction> Refresh(long patNum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<FlowAction>>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			string command="SELECT * FROM flowaction WHERE PatNum = "+POut.Long(patNum);
-			return Crud.FlowActionCrud.SelectMany(command);
-		}
-		
-		///<summary>Gets one FlowAction from the db.</summary>
-		public static FlowAction GetOne(long flowActionNum){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				return Meth.GetObject<FlowAction>(MethodBase.GetCurrentMethod(),flowActionNum);
-			}
-			return Crud.FlowActionCrud.SelectOne(flowActionNum);
-		}
+        #endregion
+        #region Methods - Get
+        ///<summary></summary>
+        public static List<FlowAction> Refresh(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<FlowAction>>(MethodBase.GetCurrentMethod(), patNum);
+            }
+            string command = "SELECT * FROM flowaction WHERE PatNum = " + POut.Long(patNum);
+            return Crud.FlowActionCrud.SelectMany(command);
+        }
 
-		///<summary>Gets one FlowAction from the db.</summary>
-		public static List<FlowAction> GetListForFlow(long flowNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<FlowAction>>(MethodBase.GetCurrentMethod(),flowNum);
-			}
-			string command = $"SELECT * FROM flowaction WHERE FlowNum = {flowNum}";
-			return Crud.FlowActionCrud.SelectMany(command);
-		}
+        ///<summary>Gets one FlowAction from the db.</summary>
+        public static FlowAction GetOne(long flowActionNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<FlowAction>(MethodBase.GetCurrentMethod(), flowActionNum);
+            }
+            return Crud.FlowActionCrud.SelectOne(flowActionNum);
+        }
 
-		#endregion Methods - Get
-		#region Methods - Modify
-		///<summary></summary>
-		public static long Insert(FlowAction flowAction){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				flowAction.FlowActionNum=Meth.GetLong(MethodBase.GetCurrentMethod(),flowAction);
-				return flowAction.FlowActionNum;
-			}
-			return Crud.FlowActionCrud.Insert(flowAction);
-		}
-		///<summary></summary>
-		public static void Update(FlowAction flowAction){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),flowAction);
-				return;
-			}
-			Crud.FlowActionCrud.Update(flowAction);
-		}
-		///<summary></summary>
-		public static void Delete(long flowActionNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),flowActionNum);
-				return;
-			}
-			Crud.FlowActionCrud.Delete(flowActionNum);
-		}
-		#endregion Methods - Modify
-		#region Methods - Misc
-		
+        ///<summary>Gets one FlowAction from the db.</summary>
+        public static List<FlowAction> GetListForFlow(long flowNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<FlowAction>>(MethodBase.GetCurrentMethod(), flowNum);
+            }
+            string command = $"SELECT * FROM flowaction WHERE FlowNum = {flowNum}";
+            return Crud.FlowActionCrud.SelectMany(command);
+        }
 
-		
-		#endregion Methods - Misc
+        #endregion Methods - Get
+        #region Methods - Modify
+        ///<summary></summary>
+        public static long Insert(FlowAction flowAction)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                flowAction.FlowActionNum = Meth.GetLong(MethodBase.GetCurrentMethod(), flowAction);
+                return flowAction.FlowActionNum;
+            }
+            return Crud.FlowActionCrud.Insert(flowAction);
+        }
+        ///<summary></summary>
+        public static void Update(FlowAction flowAction)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), flowAction);
+                return;
+            }
+            Crud.FlowActionCrud.Update(flowAction);
+        }
+        ///<summary></summary>
+        public static void Delete(long flowActionNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), flowActionNum);
+                return;
+            }
+            Crud.FlowActionCrud.Delete(flowActionNum);
+        }
+        #endregion Methods - Modify
+        #region Methods - Misc
 
 
 
-	}
+        #endregion Methods - Misc
+
+
+
+    }
 }

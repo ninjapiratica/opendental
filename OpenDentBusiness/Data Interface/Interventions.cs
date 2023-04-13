@@ -1,14 +1,13 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class Interventions{
-		//If this table type will exist as cached data, uncomment the CachePattern region below.
-		/*
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class Interventions
+    {
+        //If this table type will exist as cached data, uncomment the CachePattern region below.
+        /*
 		#region CachePattern
 		private class InterventionCache : CacheListAbs<Intervention> {
 			protected override List<Intervention> GetCacheFromDb() {
@@ -85,71 +84,85 @@ namespace OpenDentBusiness{
 
 		#endregion
 		*/
-		
-		///<summary></summary>
-		public static long Insert(Intervention intervention) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				intervention.InterventionNum=Meth.GetLong(MethodBase.GetCurrentMethod(),intervention);
-				return intervention.InterventionNum;
-			}
-			return Crud.InterventionCrud.Insert(intervention);
-		}
 
-		///<summary></summary>
-		public static void Update(Intervention intervention) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),intervention);
-				return;
-			}
-			Crud.InterventionCrud.Update(intervention);
-		}
+        ///<summary></summary>
+        public static long Insert(Intervention intervention)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                intervention.InterventionNum = Meth.GetLong(MethodBase.GetCurrentMethod(), intervention);
+                return intervention.InterventionNum;
+            }
+            return Crud.InterventionCrud.Insert(intervention);
+        }
 
-		///<summary></summary>
-		public static void Delete(long interventionNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),interventionNum);
-				return;
-			}
-			string command= "DELETE FROM intervention WHERE InterventionNum = "+POut.Long(interventionNum);
-			Db.NonQ(command);
-		}
+        ///<summary></summary>
+        public static void Update(Intervention intervention)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), intervention);
+                return;
+            }
+            Crud.InterventionCrud.Update(intervention);
+        }
 
-		///<summary></summary>
-		public static List<Intervention> Refresh(long patNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<Intervention>>(MethodBase.GetCurrentMethod(),patNum);
-			}
-			string command="SELECT * FROM intervention WHERE PatNum = "+POut.Long(patNum);
-			return Crud.InterventionCrud.SelectMany(command);
-		}
+        ///<summary></summary>
+        public static void Delete(long interventionNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), interventionNum);
+                return;
+            }
+            string command = "DELETE FROM intervention WHERE InterventionNum = " + POut.Long(interventionNum);
+            Db.NonQ(command);
+        }
 
-		public static List<Intervention> Refresh(long patNum,InterventionCodeSet codeSet) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<Intervention>>(MethodBase.GetCurrentMethod(),patNum,codeSet);
-			}
-			string command="SELECT * FROM intervention WHERE PatNum = "+POut.Long(patNum)+" AND CodeSet = "+POut.Int((int)codeSet);
-			return Crud.InterventionCrud.SelectMany(command);
-		}
+        ///<summary></summary>
+        public static List<Intervention> Refresh(long patNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<Intervention>>(MethodBase.GetCurrentMethod(), patNum);
+            }
+            string command = "SELECT * FROM intervention WHERE PatNum = " + POut.Long(patNum);
+            return Crud.InterventionCrud.SelectMany(command);
+        }
 
-		///<summary>Gets list of CodeValue strings from interventions with DateEntry in the last year and CodeSet equal to the supplied codeSet.
-		///Result list is grouped by CodeValue, CodeSystem even though we only return the list of CodeValues.  However, there are no codes in the
-		///EHR intervention code list that conflict between code systems, so we should never have a duplicate code in the returned list.</summary>
-		public static List<string> GetAllForCodeSet(InterventionCodeSet codeSet) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod(),codeSet);
-			}
-			string command="SELECT CodeValue FROM intervention WHERE CodeSet="+POut.Int((int)codeSet)+" "
-				+"AND "+DbHelper.DtimeToDate("DateEntry")+">="+POut.Date(MiscData.GetNowDateTime().AddYears(-1))+" "
-				+"GROUP BY CodeValue,CodeSystem";
-			return Db.GetListString(command);
-		}
+        public static List<Intervention> Refresh(long patNum, InterventionCodeSet codeSet)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<Intervention>>(MethodBase.GetCurrentMethod(), patNum, codeSet);
+            }
+            string command = "SELECT * FROM intervention WHERE PatNum = " + POut.Long(patNum) + " AND CodeSet = " + POut.Int((int)codeSet);
+            return Crud.InterventionCrud.SelectMany(command);
+        }
 
-		///<summary>Gets one Intervention from the db.</summary>
-		public static Intervention GetOne(long interventionNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<Intervention>(MethodBase.GetCurrentMethod(),interventionNum);
-			}
-			return Crud.InterventionCrud.SelectOne(interventionNum);
-		}
-	}
+        ///<summary>Gets list of CodeValue strings from interventions with DateEntry in the last year and CodeSet equal to the supplied codeSet.
+        ///Result list is grouped by CodeValue, CodeSystem even though we only return the list of CodeValues.  However, there are no codes in the
+        ///EHR intervention code list that conflict between code systems, so we should never have a duplicate code in the returned list.</summary>
+        public static List<string> GetAllForCodeSet(InterventionCodeSet codeSet)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod(), codeSet);
+            }
+            string command = "SELECT CodeValue FROM intervention WHERE CodeSet=" + POut.Int((int)codeSet) + " "
+                + "AND " + DbHelper.DtimeToDate("DateEntry") + ">=" + POut.Date(MiscData.GetNowDateTime().AddYears(-1)) + " "
+                + "GROUP BY CodeValue,CodeSystem";
+            return Db.GetListString(command);
+        }
+
+        ///<summary>Gets one Intervention from the db.</summary>
+        public static Intervention GetOne(long interventionNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<Intervention>(MethodBase.GetCurrentMethod(), interventionNum);
+            }
+            return Crud.InterventionCrud.SelectOne(interventionNum);
+        }
+    }
 }

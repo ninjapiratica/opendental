@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Reflection;
 
-namespace OpenDentBusiness {
-	public class RpDentalSealantMeasure {
-		public static DataTable GetDentalSealantMeasureTable(string year) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),year);
-			}
-			string command=@"SET @ReportingDateStart = CONCAT("+year+@",'-','01','-','01'), @ReportingDateEnd = CONCAT("+year+@",'-','12','-','31');
+namespace OpenDentBusiness
+{
+    public class RpDentalSealantMeasure
+    {
+        public static DataTable GetDentalSealantMeasureTable(string year)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetTable(MethodBase.GetCurrentMethod(), year);
+            }
+            string command = @"SET @ReportingDateStart = CONCAT(" + year + @",'-','01','-','01'), @ReportingDateEnd = CONCAT(" + year + @",'-','12','-','31');
 				SET @PatientDOBStart = @ReportingDateStart - INTERVAL 9 YEAR, @PatientDOBEnd = @ReportingDateEnd - INTERVAL 6 YEAR;
 				SELECT provider.LName AS 'Provider', 
 				COUNT(ColC.NumeratorPat) AS 'Numerator',
@@ -133,9 +135,9 @@ namespace OpenDentBusiness {
 				)ColC ON ColC.NumeratorPat = ColA.DenominatorPat
 				INNER JOIN provider ON provider.ProvNum = ColA.ProvNum
 				GROUP BY LName";
-			return ReportsComplex.RunFuncOnReportServer(() => Db.GetTable(command));
+            return ReportsComplex.RunFuncOnReportServer(() => Db.GetTable(command));
 
-		}	
-	}
+        }
+    }
 
 }

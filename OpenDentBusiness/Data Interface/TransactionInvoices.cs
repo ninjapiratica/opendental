@@ -1,49 +1,55 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class TransactionInvoices{
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class TransactionInvoices
+    {
 
-		///<summary></summary>
-		public static TransactionInvoice GetOne(long transactionInvoiceNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<TransactionInvoice>(MethodBase.GetCurrentMethod(),transactionInvoiceNum);
-			}
-			string command="SELECT * FROM transactioninvoice WHERE TransactionInvoiceNum = "+POut.Long(transactionInvoiceNum);
-			return Crud.TransactionInvoiceCrud.SelectOne(command);
-		}
+        ///<summary></summary>
+        public static TransactionInvoice GetOne(long transactionInvoiceNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<TransactionInvoice>(MethodBase.GetCurrentMethod(), transactionInvoiceNum);
+            }
+            string command = "SELECT * FROM transactioninvoice WHERE TransactionInvoiceNum = " + POut.Long(transactionInvoiceNum);
+            return Crud.TransactionInvoiceCrud.SelectOne(command);
+        }
 
-		///<summary>Used only to get the name of the file, so we're not querying the entire document data (which could be multiple megabytes).</summary>
-		public static string GetName(long transactionInvoiceNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetString(MethodBase.GetCurrentMethod(),transactionInvoiceNum);
-			}
-			string command="SELECT FileName FROM transactioninvoice WHERE TransactionInvoiceNum = "+POut.Long(transactionInvoiceNum);
-			return Db.GetScalar(command);
-		}
+        ///<summary>Used only to get the name of the file, so we're not querying the entire document data (which could be multiple megabytes).</summary>
+        public static string GetName(long transactionInvoiceNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetString(MethodBase.GetCurrentMethod(), transactionInvoiceNum);
+            }
+            string command = "SELECT FileName FROM transactioninvoice WHERE TransactionInvoiceNum = " + POut.Long(transactionInvoiceNum);
+            return Db.GetScalar(command);
+        }
 
-		///<summary></summary>
-		public static long Insert(TransactionInvoice transactionInvoice) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				transactionInvoice.TransactionInvoiceNum=Meth.GetLong(MethodBase.GetCurrentMethod(),transactionInvoice);
-				return transactionInvoice.TransactionInvoiceNum;
-			}
-			return Crud.TransactionInvoiceCrud.Insert(transactionInvoice);
-		}
+        ///<summary></summary>
+        public static long Insert(TransactionInvoice transactionInvoice)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                transactionInvoice.TransactionInvoiceNum = Meth.GetLong(MethodBase.GetCurrentMethod(), transactionInvoice);
+                return transactionInvoice.TransactionInvoiceNum;
+            }
+            return Crud.TransactionInvoiceCrud.Insert(transactionInvoice);
+        }
 
-		///<summary></summary>
-		public static void Delete(long transactionInvoiceNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),transactionInvoiceNum);
-				return;
-			}
-			Crud.TransactionInvoiceCrud.Delete(transactionInvoiceNum);
-		}
-		/*
+        ///<summary></summary>
+        public static void Delete(long transactionInvoiceNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), transactionInvoiceNum);
+                return;
+            }
+            Crud.TransactionInvoiceCrud.Delete(transactionInvoiceNum);
+        }
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 		#region Methods - Get
 
@@ -76,5 +82,5 @@ namespace OpenDentBusiness{
 
 
 
-	}
+    }
 }

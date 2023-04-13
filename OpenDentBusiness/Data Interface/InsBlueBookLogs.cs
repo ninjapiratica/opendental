@@ -1,49 +1,54 @@
 using OpenDentBusiness.Crud;
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class InsBlueBookLogs{
-		#region Get Methods
-		///<summary>Gets all InsBlueBookLogs for a given ClaimProcNum</summary>
-		public static List<InsBlueBookLog> GetAllByClaimProcNum(long claimProcNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<InsBlueBookLog>>(MethodBase.GetCurrentMethod(),claimProcNum);
-			}
-			string command="SELECT * FROM insbluebooklog WHERE ClaimProcNum = "+POut.Long(claimProcNum);
-			return InsBlueBookLogCrud.SelectMany(command);
-		}
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class InsBlueBookLogs
+    {
+        #region Get Methods
+        ///<summary>Gets all InsBlueBookLogs for a given ClaimProcNum</summary>
+        public static List<InsBlueBookLog> GetAllByClaimProcNum(long claimProcNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<InsBlueBookLog>>(MethodBase.GetCurrentMethod(), claimProcNum);
+            }
+            string command = "SELECT * FROM insbluebooklog WHERE ClaimProcNum = " + POut.Long(claimProcNum);
+            return InsBlueBookLogCrud.SelectMany(command);
+        }
 
-		///<summary>Gets the most recent InsBlueBookLog for a ClaimProc. Returns null if ClaimProc has none.</summary>
-		public static InsBlueBookLog GetMostRecentForClaimProc(long claimProcNum) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<InsBlueBookLog>(MethodBase.GetCurrentMethod(),claimProcNum);
-			}
-			string command=$@"
+        ///<summary>Gets the most recent InsBlueBookLog for a ClaimProc. Returns null if ClaimProc has none.</summary>
+        public static InsBlueBookLog GetMostRecentForClaimProc(long claimProcNum)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<InsBlueBookLog>(MethodBase.GetCurrentMethod(), claimProcNum);
+            }
+            string command = $@"
 				SELECT * FROM insbluebooklog
 				WHERE ClaimProcNum={POut.Long(claimProcNum)}
 				ORDER BY insbluebooklog.DateTEntry DESC
 				LIMIT 1";
-			return InsBlueBookLogCrud.SelectOne(command);
-		}
-		#endregion Get Methods
+            return InsBlueBookLogCrud.SelectOne(command);
+        }
+        #endregion Get Methods
 
-		#region Modification Methods
-		///<summary>Inserts an InsBlueBookLog into the DB and returns the InsBlueBookLogNum.</summary>
-		public static long Insert(InsBlueBookLog insBlueBookLog){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				insBlueBookLog.InsBlueBookLogNum=Meth.GetLong(MethodBase.GetCurrentMethod(),insBlueBookLog);
-				return insBlueBookLog.InsBlueBookLogNum;
-			}
-			return Crud.InsBlueBookLogCrud.Insert(insBlueBookLog);
-		}
-		#endregion Modification Methods
+        #region Modification Methods
+        ///<summary>Inserts an InsBlueBookLog into the DB and returns the InsBlueBookLogNum.</summary>
+        public static long Insert(InsBlueBookLog insBlueBookLog)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                insBlueBookLog.InsBlueBookLogNum = Meth.GetLong(MethodBase.GetCurrentMethod(), insBlueBookLog);
+                return insBlueBookLog.InsBlueBookLogNum;
+            }
+            return Crud.InsBlueBookLogCrud.Insert(insBlueBookLog);
+        }
+        #endregion Modification Methods
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 		#region Get Methods
 		///<summary></summary>
@@ -87,5 +92,5 @@ namespace OpenDentBusiness{
 		
 		#endregion Misc Methods
 		*/
-	}
+    }
 }

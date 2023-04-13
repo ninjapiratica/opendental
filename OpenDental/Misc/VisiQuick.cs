@@ -1,4 +1,4 @@
-  //VisiQuick integration code written by Thomas Jensen tje@thomsystems.com
+//VisiQuick integration code written by Thomas Jensen tje@thomsystems.com
 /*
 using System;
 using System.Diagnostics;

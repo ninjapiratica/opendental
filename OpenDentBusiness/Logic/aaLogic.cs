@@ -9,6 +9,5 @@
 //These methods should not contain queries.
 //For queries, use an S class in the Data Inteface folder.
 //Or use Db Multi Table if there are many db tables involved, so it's hard to pick an S class.
- 
+
 //Classes in this folder can use local Cache without any problems.
-  

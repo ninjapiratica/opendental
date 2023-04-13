@@ -1,47 +1,51 @@
 using CodeBase;
-using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class InsBlueBookRules{
-		#region Get Methods
-		///<summary>Gets all insbluebookrules from db as list.</summary>
-		public static List<InsBlueBookRule> GetAll() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetObject<List<InsBlueBookRule>>(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT insbluebookrule.* FROM insbluebookrule";
-			return Crud.InsBlueBookRuleCrud.SelectMany(command);
-		}
-		#endregion Get Methods
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class InsBlueBookRules
+    {
+        #region Get Methods
+        ///<summary>Gets all insbluebookrules from db as list.</summary>
+        public static List<InsBlueBookRule> GetAll()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetObject<List<InsBlueBookRule>>(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT insbluebookrule.* FROM insbluebookrule";
+            return Crud.InsBlueBookRuleCrud.SelectMany(command);
+        }
+        #endregion Get Methods
 
-		#region Modification Methods
-		///<summary>Updates an insbluebookrule to the db if it has changed.</summary>
-		public static void Update(InsBlueBookRule insBlueBookRule,InsBlueBookRule oldInsBlueBookRule) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),insBlueBookRule,oldInsBlueBookRule);
-				return;
-			}
-			Crud.InsBlueBookRuleCrud.Update(insBlueBookRule,oldInsBlueBookRule);
-		}
-		#endregion Modification Methods
+        #region Modification Methods
+        ///<summary>Updates an insbluebookrule to the db if it has changed.</summary>
+        public static void Update(InsBlueBookRule insBlueBookRule, InsBlueBookRule oldInsBlueBookRule)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), insBlueBookRule, oldInsBlueBookRule);
+                return;
+            }
+            Crud.InsBlueBookRuleCrud.Update(insBlueBookRule, oldInsBlueBookRule);
+        }
+        #endregion Modification Methods
 
-		#region Misc Methods
-		///<summary>Returns true if a date limitation applies to the rule's InsBlueBookRuleType. Types InsuranceCarrierGroup, InsuranceCarrier, GroupNumber, and InsurancePlan.</summary>
-		public static bool IsDateLimitedType(InsBlueBookRule rule) {
-			return (rule.RuleType.In(
-				InsBlueBookRuleType.InsuranceCarrierGroup,
-				InsBlueBookRuleType.InsuranceCarrier,
-				InsBlueBookRuleType.GroupNumber,
-				InsBlueBookRuleType.InsurancePlan));
-		}
-		#endregion Misc Methods
+        #region Misc Methods
+        ///<summary>Returns true if a date limitation applies to the rule's InsBlueBookRuleType. Types InsuranceCarrierGroup, InsuranceCarrier, GroupNumber, and InsurancePlan.</summary>
+        public static bool IsDateLimitedType(InsBlueBookRule rule)
+        {
+            return (rule.RuleType.In(
+                InsBlueBookRuleType.InsuranceCarrierGroup,
+                InsBlueBookRuleType.InsuranceCarrier,
+                InsBlueBookRuleType.GroupNumber,
+                InsBlueBookRuleType.InsurancePlan));
+        }
+        #endregion Misc Methods
 
-		/*
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 		#region Get Methods
 		///<summary></summary>
@@ -93,5 +97,5 @@ namespace OpenDentBusiness{
 		
 		#endregion Misc Methods
 		*/
-	}
+    }
 }

@@ -2,99 +2,119 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
-using System.Text;
 
-namespace OpenDentBusiness{
-	///<summary></summary>
-	public class Sops{
-		#region CachePattern
+namespace OpenDentBusiness
+{
+    ///<summary></summary>
+    public class Sops
+    {
+        #region CachePattern
 
-		private class SopCache : CacheListAbs<Sop> {
-			protected override List<Sop> GetCacheFromDb() {
-				string command="SELECT * FROM sop";
-				return Crud.SopCrud.SelectMany(command);
-			}
-			protected override List<Sop> TableToList(DataTable table) {
-				return Crud.SopCrud.TableToList(table);
-			}
-			protected override Sop Copy(Sop sop) {
-				return sop.Copy();
-			}
-			protected override DataTable ListToTable(List<Sop> listSops) {
-				return Crud.SopCrud.ListToTable(listSops,"Sop");
-			}
-			protected override void FillCacheIfNeeded() {
-				Sops.GetTableFromCache(false);
-			}
-		}
-		
-		///<summary>The object that accesses the cache in a thread-safe manner.</summary>
-		private static SopCache _sopCache=new SopCache();
+        private class SopCache : CacheListAbs<Sop>
+        {
+            protected override List<Sop> GetCacheFromDb()
+            {
+                string command = "SELECT * FROM sop";
+                return Crud.SopCrud.SelectMany(command);
+            }
+            protected override List<Sop> TableToList(DataTable table)
+            {
+                return Crud.SopCrud.TableToList(table);
+            }
+            protected override Sop Copy(Sop sop)
+            {
+                return sop.Copy();
+            }
+            protected override DataTable ListToTable(List<Sop> listSops)
+            {
+                return Crud.SopCrud.ListToTable(listSops, "Sop");
+            }
+            protected override void FillCacheIfNeeded()
+            {
+                Sops.GetTableFromCache(false);
+            }
+        }
 
-		public static List<Sop> GetDeepCopy(bool isShort=false) {
-			return _sopCache.GetDeepCopy(isShort);
-		}
+        ///<summary>The object that accesses the cache in a thread-safe manner.</summary>
+        private static SopCache _sopCache = new SopCache();
 
-		public static Sop GetFirstOrDefault(Func<Sop,bool> match,bool isShort=false) {
-			return _sopCache.GetFirstOrDefault(match,isShort);
-		}
+        public static List<Sop> GetDeepCopy(bool isShort = false)
+        {
+            return _sopCache.GetDeepCopy(isShort);
+        }
 
-		///<summary>Refreshes the cache and returns it as a DataTable. This will refresh the ClientWeb's cache and the ServerWeb's cache.</summary>
-		public static DataTable RefreshCache() {
-			return GetTableFromCache(true);
-		}
+        public static Sop GetFirstOrDefault(Func<Sop, bool> match, bool isShort = false)
+        {
+            return _sopCache.GetFirstOrDefault(match, isShort);
+        }
 
-		///<summary>Fills the local cache with the passed in DataTable.</summary>
-		public static void FillCacheFromTable(DataTable table) {
-			_sopCache.FillCacheFromTable(table);
-		}
+        ///<summary>Refreshes the cache and returns it as a DataTable. This will refresh the ClientWeb's cache and the ServerWeb's cache.</summary>
+        public static DataTable RefreshCache()
+        {
+            return GetTableFromCache(true);
+        }
 
-		///<summary>Always refreshes the ClientWeb's cache.</summary>
-		public static DataTable GetTableFromCache(bool doRefreshCache) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				DataTable table=Meth.GetTable(MethodBase.GetCurrentMethod(),doRefreshCache);
-				_sopCache.FillCacheFromTable(table);
-				return table;
-			}
-			return _sopCache.GetTableFromCache(doRefreshCache);
-		}
+        ///<summary>Fills the local cache with the passed in DataTable.</summary>
+        public static void FillCacheFromTable(DataTable table)
+        {
+            _sopCache.FillCacheFromTable(table);
+        }
 
-		#endregion
+        ///<summary>Always refreshes the ClientWeb's cache.</summary>
+        public static DataTable GetTableFromCache(bool doRefreshCache)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                DataTable table = Meth.GetTable(MethodBase.GetCurrentMethod(), doRefreshCache);
+                _sopCache.FillCacheFromTable(table);
+                return table;
+            }
+            return _sopCache.GetTableFromCache(doRefreshCache);
+        }
 
-		///<summary></summary>
-		public static long Insert(Sop sop){
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT){
-				sop.SopNum=Meth.GetLong(MethodBase.GetCurrentMethod(),sop);
-				return sop.SopNum;
-			}
-			return Crud.SopCrud.Insert(sop);
-		}
+        #endregion
 
-		///<summary></summary>
-		public static void Update(Sop sop) {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),sop);
-				return;
-			}
-			Crud.SopCrud.Update(sop);
-		}
+        ///<summary></summary>
+        public static long Insert(Sop sop)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                sop.SopNum = Meth.GetLong(MethodBase.GetCurrentMethod(), sop);
+                return sop.SopNum;
+            }
+            return Crud.SopCrud.Insert(sop);
+        }
 
-		///<summary>Returns the count of all SOP codes.  SOP codes cannot be hidden.</summary>
-		public static long GetCodeCount() {
-			if(RemotingClient.MiddleTierRole==MiddleTierRole.ClientMT) {
-				return Meth.GetLong(MethodBase.GetCurrentMethod());
-			}
-			string command="SELECT COUNT(*) FROM sop";
-			return PIn.Long(Db.GetCount(command));
-		}
+        ///<summary></summary>
+        public static void Update(Sop sop)
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                Meth.GetVoid(MethodBase.GetCurrentMethod(), sop);
+                return;
+            }
+            Crud.SopCrud.Update(sop);
+        }
 
-		///<summary>Returns the description for the specified SopCode.  Returns an empty string if no code is found.</summary>
-		public static string GetDescriptionFromCode(string sopCode) {
-			Sop sop=GetFirstOrDefault(x => x.SopCode==sopCode);
-			return (sop==null ? "" : sop.Description);
-		}
+        ///<summary>Returns the count of all SOP codes.  SOP codes cannot be hidden.</summary>
+        public static long GetCodeCount()
+        {
+            if (RemotingClient.MiddleTierRole == MiddleTierRole.ClientMT)
+            {
+                return Meth.GetLong(MethodBase.GetCurrentMethod());
+            }
+            string command = "SELECT COUNT(*) FROM sop";
+            return PIn.Long(Db.GetCount(command));
+        }
 
-		/*
+        ///<summary>Returns the description for the specified SopCode.  Returns an empty string if no code is found.</summary>
+        public static string GetDescriptionFromCode(string sopCode)
+        {
+            Sop sop = GetFirstOrDefault(x => x.SopCode == sopCode);
+            return (sop == null ? "" : sop.Description);
+        }
+
+        /*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 
 		///<summary></summary>
@@ -124,5 +144,5 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		*/
-	}
+    }
 }
